@@ -1,0 +1,1 @@
+// para funções que mexem no localstorage
