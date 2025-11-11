@@ -1,4 +1,3 @@
-// --- CORREÇÃO: REMOVA O IMPORT 'navigateTo' DAQUI ---
 import { 
   addNotebook, 
   addProblem, 
@@ -8,11 +7,11 @@ import {
 import { 
   renderNotebooksPage, 
   showNotebookModal, 
-  hideNotebookModal 
+  hideNotebookModal,
+  renderNotebookList
 } from './ui.js';
 import { CODEFORCES_TAGS } from './api.js';
 
-// --- CORREÇÃO: A FUNÇÃO AGORA RECEBE 'navigateToCallback' ---
 let navigateTo = () => {}; // Função placeholder
 
 /**
@@ -20,7 +19,7 @@ let navigateTo = () => {}; // Função placeholder
  * @param {Event} event 
  */
 function handleSubmit(event) {
-  event.preventDefault(); // Impede o recarregamento da página
+  event.preventDefault(); 
   const formId = event.target.id;
   const data = getStorage();
 
@@ -33,13 +32,11 @@ function handleSubmit(event) {
       const title = titleInput.value;
       const description = descInput.value;
       
-      addNotebook(title, description); // Salva no storage
+      addNotebook(title, description); 
       
-      // Limpa o formulário
       titleInput.value = '';
       descInput.value = '';
       
-      // Re-renderiza a página de cadernos com os dados atualizados
       const newData = getStorage();
       renderNotebooksPage(newData.notebooks, CODEFORCES_TAGS);
     }
@@ -52,19 +49,15 @@ function handleSubmit(event) {
     const notebookId = document.getElementById('q-notebook').value;
     const tagsElement = document.getElementById('q-tags');
     
-    // Pega todas as tags selecionadas do <select multiple>
     const tags = Array.from(tagsElement.selectedOptions)
                       .map(option => option.value);
 
     if (title && url && notebookId && tags.length > 0) {
-      // Adiciona o problema ao storage
       const success = addProblem(notebookId, title, url, tags);
       
-      if (success !== false) { // Verifica se não houve erro (função retorna undefined no sucesso)
-        // Limpa (reseta) o formulário de adicionar questão
+      if (success !== false) { 
         event.target.reset();
         
-        // Re-renderiza a página de cadernos para atualizar a contagem
         const newData = getStorage();
         renderNotebooksPage(newData.notebooks, CODEFORCES_TAGS);
       } else {
@@ -75,7 +68,6 @@ function handleSubmit(event) {
     }
   }
   
-  // --- Lógica para Criar Simulado ---
   if (formId === 'new-simulado-form') {
     alert("Funcionalidade de Simulado ainda não implementada!");
   }
@@ -86,32 +78,23 @@ function handleSubmit(event) {
  * @param {Event} event 
  */
 function handleClick(event) {
-  const target = event.target; // O elemento exato que foi clicado
+  const target = event.target; 
 
-  // --- Lógica de Navegação (Dashboard/Cadernos) ---
   const navButton = target.closest('.nav-button');
   if (navButton) {
-    // 1. Remove a classe 'active' de TODOS os botões de navegação
     document.querySelectorAll('.nav-button').forEach(btn => {
       btn.classList.remove('active');
     });
-    
-    // 2. Adiciona a classe 'active' APENAS no botão que foi clicado
     navButton.classList.add('active');
 
-    // 3. Navega para a página correta
     if (navButton.id === 'nav-home') {
-      // --- CORREÇÃO: USA O CALLBACK ---
       navigateTo('home');
     } else if (navButton.id === 'nav-notebooks') {
-      // --- CORREÇÃO: USA O CALLBACK ---
       navigateTo('notebooks');
     }
-    return; // Para a execução, pois foi um clique de navegação
+    return;
   }
 
-
-  // --- Lógica para ABRIR o Modal (clique no card) ---
   const card = target.closest('.notebook-card');
   if (card) {
     const notebookId = card.dataset.notebookId;
@@ -119,29 +102,58 @@ function handleClick(event) {
     if (notebook) {
       showNotebookModal(notebook);
     }
-    return; // Para a execução
+    return; 
   }
 
-  // --- Lógica para FECHAR o Modal ---
-  // Se clicou no 'x' OU no fundo escuro (o próprio backdrop)
   if (target.id === 'modal-close-btn' || target.id === 'notebook-modal') {
     hideNotebookModal();
-    return; // Para a execução
+    return;
+  }
+}
+
+/**
+ * Lida com todos os eventos de 'input' (digitação) na página.
+ * @param {Event} event 
+ */
+function handleInput(event) {
+  // Filtra para rodar apenas no input de pesquisa
+  if (event.target.id === 'search-notebook') {
+    // --- DEBUG 1 ---
+    console.log('Evento "input" disparado pela barra de pesquisa!');
+    
+    const searchTerm = event.target.value.toLowerCase();
+    const { notebooks } = getStorage(); // Pega todos os cadernos
+    
+    // --- DEBUG 2 ---
+    console.log('Termo da pesquisa:', searchTerm);
+
+    // Filtra os cadernos
+    const filteredNotebooks = notebooks.filter(nb => {
+      const titleMatch = nb.title.toLowerCase().includes(searchTerm);
+      const descMatch = (nb.description || '').toLowerCase().includes(searchTerm);
+      return titleMatch || descMatch;
+    });
+    
+    // --- DEBUG 3 ---
+    console.log('Cadernos filtrados:', filteredNotebooks);
+
+    // Re-renderiza APENAS a lista de cards
+    renderNotebookList(filteredNotebooks);
   }
 }
 
 
 /**
- * Registra os 'escutadores' de eventos principais (submit e click).
+ * Registra os 'escutadores' de eventos principais.
  * @param {Function} navigateToCallback - A função 'navigateTo' do main.js
  */
 export function registerEventListeners(navigateToCallback) {
-  // --- CORREÇÃO: Armazena o callback ---
   navigateTo = navigateToCallback; 
 
-  // Usamos delegação de eventos, um 'escutador' para todos os submits
   document.addEventListener('submit', handleSubmit);
-  
-  // Um 'escutador' para todos os cliques
   document.addEventListener('click', handleClick);
+  
+  // --- DEBUG 4 ---
+  console.log('Registrando escutador de evento "input"...');
+  document.addEventListener('input', handleInput);
 }

@@ -175,6 +175,37 @@ select[multiple] option:checked {
 }
 
 /* --- 4. PÁGINA "CADERNOS" (Grid de Cards) --- */
+
+/* --- ATUALIZAÇÃO: Estilos da Barra de Pesquisa --- */
+#search-notebook {
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--widget-bg);
+  
+  /* Ícone de Lupa (SVG) */
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%239e9e9e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+  background-repeat: no-repeat;
+  background-position: 0.75rem center; /* Posição do ícone */
+  background-size: 1rem 1rem; /* 16px */
+
+  /* Padding para dar espaço ao ícone */
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem; /* 12px top/bottom/right, 40px left */
+  
+  width: 350px;
+  max-width: 100%;
+  transition: all 0.2s ease;
+}
+
+/* Efeito ao focar na barra de pesquisa */
+#search-notebook:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+}
+/* --- FIM DA ATUALIZAÇÃO --- */
+
+
 .notebook-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -214,6 +245,7 @@ select[multiple] option:checked {
 }
 
 /* --- 5. MODAL (Janela Flutuante) --- */
+/* ... (O restante dos estilos do modal permanece o mesmo) ... */
 
 /* Classe utilitária para esconder */
 .hidden {

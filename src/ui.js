@@ -84,27 +84,23 @@ export function renderNotebooksPage(notebooks, allTags) {
   const mainContent = document.getElementById('main-content');
   const sidebarContent = document.getElementById('sidebar-content');
 
-  // 1. Renderiza o conteúdo principal (Cards dos Cadernos)
+  // 1. Renderiza o conteúdo principal (AGORA COM A LISTA VAZIA)
   mainContent.innerHTML = `
     <div class="page-header">
       <h2>Meus Cadernos</h2>
       <input type="search" id="search-notebook" placeholder="Pesquisar caderno ou questão...">
     </div>
-    <div id="notebook-list" class="notebook-grid">
-      ${notebooks.length === 0 
-        ? '<p>Nenhum caderno criado. Use o formulário ao lado para começar!</p>'
-        : notebooks.map(nb => `
-            <div class="notebook-card" data-notebook-id="${nb.id}">
-              <h3 class="notebook-title">${nb.title}</h3>
-              <p class="notebook-desc">${nb.description || 'Sem descrição'}</p>
-              <span class="notebook-count">${nb.problems.length} questões</span>
-            </div>
-          `).join('')
-      }
-    </div>
+    <!-- A lista agora começa vazia e será preenchida pela renderNotebookList -->
+    <div id="notebook-list" class="notebook-grid"></div>
   `;
+  
+  // --- ATUALIZAÇÃO ---
+  // 2. Chama a nova função para preencher a lista
+  renderNotebookList(notebooks);
+  // --- FIM DA ATUALIZAÇÃO ---
 
-  // 2. Renderiza a Sidebar (Formulários)
+
+  // 3. Renderiza a Sidebar (Formulários)
   
   // Gera as <option> para o <select> de tags
   const tagsOptions = allTags.map(tag => 
@@ -259,7 +255,6 @@ export function showNotebookModal(notebook) {
 /**
  * Esconde o modal.
  */
-// --- CORREÇÃO AQUI ---
 export function hideNotebookModal() {
   const modal = document.getElementById('notebook-modal');
   if (!modal) return; // Proteção
@@ -273,3 +268,31 @@ export function hideNotebookModal() {
   if(modalTitle) modalTitle.textContent = '';
   if(modalBody) modalBody.innerHTML = '';
 }
+
+
+// --- NOVA FUNÇÃO ---
+/**
+ * Renderiza a lista de cards de caderno dentro do elemento #notebook-list.
+ * @param {Array} notebooks - A lista de cadernos a ser renderizada.
+ */
+export function renderNotebookList(notebooks) {
+  const listElement = document.getElementById('notebook-list');
+  if (!listElement) {
+    // Não é um erro, pode estar na 'home' page
+    return;
+  }
+
+  if (notebooks.length === 0) {
+    listElement.innerHTML = '<p>Nenhum caderno encontrado. Use o formulário ao lado para criar um!</p>';
+    return;
+  }
+
+  listElement.innerHTML = notebooks.map(nb => `
+    <div class="notebook-card" data-notebook-id="${nb.id}">
+      <h3 class="notebook-title">${nb.title}</h3>
+      <p class="notebook-desc">${nb.description || 'Sem descrição'}</p>
+      <span class="notebook-count">${nb.problems.length} questões</span>
+    </div>
+  `).join('');
+}
+// --- FIM DA NOVA FUNÇÃO ---
