@@ -57,3 +57,14 @@
       // Retorna os resultados "OK"
       return fakeSubmissions.result.filter(sub => sub.verdict === "OK");
     };
+// --- ADICIONE ISSO ---
+// Lista de tags (pode ser expandida)
+export const CODEFORCES_TAGS = [
+  "implementation", "dp", "math", "graphs", "data structures",
+  "greedy", "strings", "brute force", "binary search",
+  "dfs and similar", "trees", "sortings", "number theory",
+  "combinatorics", "two pointers", "bitmasks", "geometry",
+  "shortest paths", "probabilities", "interactive", "hashing",
+  "divide and conquer", "games", "flows", "string suffix structures",
+  "dsu", "constructive algorithms", "fft"
+];

@@ -1,55 +1,69 @@
-import { addNotebook, addProblem } from './storage.js'; // 1. Importe a nova função 'addProblem'
-import { renderNotebooks } from './ui.js';
+import { addNotebook, addProblem } from './storage.js';
 
-export function registerEventListeners() {
+/**
+ * Registra todos os listeners da aplicação.
+ * Usa delegação de eventos para 'click' e 'submit'
+ * @param {function} navigateTo - Função para trocar de página (de main.js)
+ * @param {function} renderCurrentPage - Função para re-renderizar a view (de main.js)
+ */
+export function registerEventListeners(navigateTo, renderCurrentPage) {
   
-  // Usamos um único listener no 'document' para "ouvir" todos os submits
+  // Listener genérico para cliques (Navegação)
+  document.addEventListener('click', (event) => {
+    
+    // Navegação HOME
+    if (event.target.id === 'nav-home') {
+      navigateTo('home');
+    }
+    
+    // Navegação CADERNOS
+    if (event.target.id === 'nav-notebooks') {
+      navigateTo('notebooks');
+    }
+  });
+
+  // Listener genérico para formulários
   document.addEventListener('submit', (event) => {
     
-    // CASO 1: O formulário de NOVO CADERNO foi enviado
+    // CASO 1: Formulário CRIAR CADERNO
     if (event.target.id === 'new-notebook-form') {
-      event.preventDefault(); // Impede o recarregamento da página
-      const input = document.getElementById('notebook-title');
-      const title = input.value.trim();
+      event.preventDefault(); 
+      const title = document.getElementById('nb-nome').value;
+      const description = document.getElementById('nb-desc').value;
 
       if (title) {
-        addNotebook(title); 
-        renderNotebooks(); // Re-renderiza a lista de cadernos
-        input.value = ''; 
+        addNotebook(title, description); 
+        renderCurrentPage(); // Re-renderiza a página de cadernos para mostrar o novo
       }
     }
-
-    // --- INÍCIO DA NOVA LÓGICA ---
     
-    // CASO 2: O formulário de NOVO PROBLEMA foi enviado
-    // (Verificamos pela classe que definimos no ui.js)
-    if (event.target.classList.contains('new-problem-form')) {
-      event.preventDefault(); // Impede o recarregamento da página
-
-      const form = event.target;
+    // CASO 2: Formulário ADD QUESTÃO
+    if (event.target.id === 'add-question-form') {
+      event.preventDefault(); 
       
-      // 2. Pegamos o ID do caderno que guardamos no 'data-attribute'
-      const notebookId = Number(form.dataset.notebookId);
+      const title = document.getElementById('q-nome').value;
+      const url = document.getElementById('q-link').value;
+      const tags = document.getElementById('q-tags').value;
+      const notebookId = document.getElementById('q-caderno').value;
 
-      // 3. Pegamos os inputs DENTRO do formulário que foi enviado
-      const titleInput = form.querySelector('.problem-title');
-      const urlInput = form.querySelector('.problem-url');
-
-      const title = titleInput.value.trim();
-      const url = urlInput.value.trim();
-
-      // 4. Se tudo estiver preenchido, chamamos a função 'addProblem'
       if (title && url && notebookId) {
-        addProblem(notebookId, title, url); // Salva no LocalStorage
+        addProblem(notebookId, title, url, tags);
+        // Não precisa re-renderizar, pois a sidebar não muda
+        // Mas podemos re-renderizar para atualizar o <select> no futuro
+        // Por agora, vamos re-renderizar para atualizar o card (contagem de questões)
+        renderCurrentPage(); 
         
-        renderNotebooks(); // Re-renderiza tudo para mostrar o novo problema
-        
-        // (Não precisamos limpar os inputs, pois a re-renderização já faz isso)
-        // Mas se não fizesse, limparíamos aqui:
-        // titleInput.value = '';
-        // urlInput.value = '';
+        // Limpar o formulário
+        event.target.reset();
+      } else if (!notebookId) {
+        alert("Por favor, crie um caderno antes de adicionar uma questão!");
       }
     }
-    // --- FIM DA NOVA LÓGICA ---
+
+    // CASO 3: Formulário Simulado (não faz nada)
+    if (event.target.id === 'simulado-form') {
+      event.preventDefault();
+      alert("Funcionalidade de Simulado em construção!");
+    }
   });
 }
