@@ -1,216 +1,246 @@
-/* --- ESTILOS GLOBAIS --- */
+/* --- GERAL --- */
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  --bg-color: #f4f7f6;
-  --text-color: #333;
   --primary-color: #3498db;
-  --white: #ffffff;
+  --bg-color: #f4f7f6;
+  --widget-bg: #ffffff;
+  --text-color: #333;
   --border-color: #e0e0e0;
-  --shadow: 0 2px 5px rgba(0,0,0,0.05);
+  --white: #fff;
+  --header-height: 60px;
 }
 
 body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
   background-color: var(--bg-color);
   color: var(--text-color);
-  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* --- HEADER --- */
+/* --- LAYOUT PRINCIPAL --- */
 header {
-  background-color: var(--white);
-  padding: 0 1.5rem;
+  height: var(--header-height);
+  background-color: var(--widget-bg);
   border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
-  height: 60px;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
+
 .menu-icon {
-  width: 24px;
-  height: 24px;
-  fill: #555;
   cursor: pointer;
+  fill: #555;
 }
+
 .logo-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-color);
   margin: 0;
 }
+
 .balloons {
   font-size: 1.25rem;
-  animation: bounce 2s infinite ease-in-out;
-}
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  cursor: help;
 }
 
-/* --- LAYOUT 2 COLUNAS --- */
 .container {
   display: flex;
-  flex: 1; /* Ocupa o resto da altura */
   max-width: 1400px;
-  width: 100%;
   margin: 1.5rem auto;
   gap: 1.5rem;
   padding: 0 1.5rem;
-  box-sizing: border-box;
 }
 
 main {
-  flex: 3; /* 75% da largura */
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex: 2; /* Ocupa 2/3 do espaço */
 }
 
 aside {
-  flex: 1; /* 25% da largura */
-  max-width: 350px; /* Largura máxima da sidebar */
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex: 1; /* Ocupa 1/3 do espaço */
+  position: sticky;
+  top: calc(var(--header-height) + 1.5rem); /* Trava a sidebar */
+  align-self: flex-start; /* Impede que estique */
 }
 
-/* --- NAVEGAÇÃO (Sidebar/Home) --- */
+/* --- NAVEGAÇÃO (Tabs) --- */
 .navigation {
   display: flex;
   gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
 }
+
 .nav-button {
-  flex: 1;
-  padding: 0.75rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
   border: 1px solid var(--border-color);
-  background: var(--white);
-  border-radius: 4px;
+  background-color: var(--widget-bg);
+  color: var(--text-color);
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
-.nav-button.active, .nav-button:hover {
+
+.nav-button.active {
   background-color: var(--primary-color);
   color: var(--white);
   border-color: var(--primary-color);
 }
 
-/* --- PÁGINA HOME (Gráfico) --- */
-.chart-container {
-  background-color: var(--white);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  height: 500px;
+.nav-button:not(.active):hover {
+  background-color: #f9f9f9;
 }
 
-/* --- PÁGINA CADERNOS (Main) --- */
-.search-bar {
-  background-color: var(--white);
-  padding: 0.5rem;
+/* --- PÁGINA HOME (Gráfico) --- */
+.chart-container {
+  background-color: var(--widget-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  height: 400px;
 }
+
+/* --- PÁGINA CADERNOS (Grid) --- */
+.search-bar {
+  margin-bottom: 1.5rem;
+}
+
 .search-bar input {
   width: 100%;
-  padding: 0.75rem;
   font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* Garante que o padding não quebre o layout */
 }
 
 .notebook-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
 }
 
 .notebook-card {
-  background-color: var(--white);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  background-color: var(--widget-bg);
   border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
+
 .notebook-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
+
 .notebook-card h4 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  color: var(--primary-color);
 }
+
 .notebook-card p {
+  margin: 0 0 1rem 0;
   font-size: 0.9rem;
   color: #555;
-  margin: 0 0 1rem 0;
+  height: 40px; /* Define altura fixa para descrição */
+  overflow: hidden;
 }
+
 .notebook-card span {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #777;
 }
 
 /* --- PÁGINA CADERNOS (Sidebar) --- */
 .form-widget {
-  background-color: var(--white);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  background-color: var(--widget-bg);
   border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
 }
+
+.form-widget + .form-widget {
+  margin-top: 1.5rem; /* Espaçamento entre os widgets */
+}
+
 .form-widget h3 {
-  margin-top: 0;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
+
 .form-widget form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
 .form-widget label {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: -0.5rem; /* Puxa o label para perto do input */
 }
+
 .form-widget input,
 .form-widget select,
 .form-widget button {
-  width: 100%;
-  padding: 0.75rem;
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* Garante padding consistente */
+  width: 100%;
 }
+
 .form-widget button {
   background-color: var(--primary-color);
-  color: white;
-  border: none;
-  font-weight: bold;
+  color: var(--white);
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
+
 .form-widget button:hover {
   background-color: #2980b9;
 }
+
 .form-widget button:disabled {
   background-color: #bdc3c7;
   cursor: not-allowed;
 }
+
+/* --- ESTILOS DO SELECT[MULTIPLE] (ADICIONADOS DE VOLTA) --- */
+.form-widget select[multiple] {
+  height: 150px; /* Define uma altura fixa */
+  padding: 0.5rem; /* Padding interno */
+  background-color: var(--white);
+}
+
+.form-widget select[multiple] option {
+  padding: 0.5rem;
+}
+.form-widget select[multiple] option:checked {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+
+/* --- (ESTILOS DO SLIM-SELECT FORAM REMOVIDOS) --- */

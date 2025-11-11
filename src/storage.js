@@ -25,7 +25,7 @@ export function addNotebook(title, description) {
 }
 
 /**
- * ATUALIZADO: Agora salva 'tags'
+ * ATUALIZADO: Agora salva 'tags' como um array
  */
 export function addProblem(notebookId, problemTitle, problemUrl, tags) {
   const data = getStorage();
@@ -36,14 +36,14 @@ export function addProblem(notebookId, problemTitle, problemUrl, tags) {
     return;
   }
 
-  // Simplificação: salvamos as tags como um array
-  const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+  // --- LINHA REMOVIDA ---
+  // A conversão .split(',') não é mais necessária.
 
   const newProblem = {
     id: Date.now() + 1,
     title: problemTitle,
     url: problemUrl,
-    tags: tagsArray, // Salva as tags
+    tags: tags, // 'tags' já é um array limpo vindo do events.js
     notes: "" 
   };
 

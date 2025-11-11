@@ -43,7 +43,11 @@ export function registerEventListeners(navigateTo, renderCurrentPage) {
       
       const title = document.getElementById('q-nome').value;
       const url = document.getElementById('q-link').value;
-      const tags = document.getElementById('q-tags').value;
+      // --- ATUALIZE AQUI ---
+      const tagsElement = document.getElementById('q-tags');
+      // Pega todos os options selecionados, transforma em array, e pega o .value de cada um
+      const tags = Array.from(tagsElement.selectedOptions).map(option => option.value);
+      // --- FIM DA ATUALIZAÇÃO ---
       const notebookId = document.getElementById('q-caderno').value;
 
       if (title && url && notebookId) {
