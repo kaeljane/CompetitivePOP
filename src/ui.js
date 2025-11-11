@@ -1,180 +1,211 @@
 import Chart from 'chart.js/auto';
-// --- LINHA DO 'SlimSelect' REMOVIDA ---
+// (O import do SlimSelect foi removido em passos anteriores, o que está correto)
 
 /**
  * Renderiza o "esqueleto" principal da aplicação (header, main, aside)
+ * @param {HTMLElement} appElement - O elemento <div id="app">
  */
 export function renderAppShell(appElement) {
   appElement.innerHTML = `
-    <header>
+    <header class="app-header">
       <div class="logo-container">
-        <!-- Ícone do Menu Hamburguer (placeholder) -->
-        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></svg>
-        <h1 class="logo-title">POP</h1>
-        <span class="balloons" title="Competitive POP">🎈</span>
+        <!-- SVG ou <img> da logo aqui -->
+        <span class="logo-text">CompetitivePOP</span>
       </div>
+      <nav>
+        <button id="nav-home" class="nav-button active">Dashboard</button>
+        <button id="nav-notebooks" class="nav-button">Cadernos</button>
+      </nav>
     </header>
+    
     <div class="container">
-      <main id="main-content"></main>
-      <aside id="sidebar-content"></aside>
+      <main id="main-content">
+        <!-- Conteúdo da página será injetado aqui -->
+      </main>
+      <aside id="sidebar-content">
+        <!-- Conteúdo da sidebar será injetado aqui -->
+      </aside>
+    </div>
+    
+    <!-- HTML do Modal (começa escondido) -->
+    <div id="notebook-modal" class="modal-backdrop hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">Título do Caderno</h3>
+          <button class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- O conteúdo do caderno (problemas) será injetado aqui -->
+        </div>
+      </div>
     </div>
   `;
 }
 
 /**
- * Renderiza a "Página Home" (Gráfico)
+ * Renderiza a página "Home" (Dashboard com gráfico)
+ * @param {object} tagData - Os dados das tags processadas
  */
 export function renderHomePage(tagData) {
   const mainContent = document.getElementById('main-content');
-  const sidebar = document.getElementById('sidebar-content');
+  const sidebarContent = document.getElementById('sidebar-content');
 
   mainContent.innerHTML = `
-    <div class="navigation">
-      <button id="nav-home" class="nav-button active">Dashboard</button>
-      <button id="nav-notebooks" class="nav-button">Cadernos</button>
+    <div class="page-header">
+      <h2>Dashboard de Performance</h2>
     </div>
-    <div class="chart-container">
-      <canvas id="tagsChart"></canvas>
+    <div class="widget">
+      <h3>Análise de Tópicos (Weakness Panel)</h3>
+      <p>Problemas com "Accepted" (dados falsos)</p>
+      <div class="chart-container">
+        <canvas id="tags-chart"></canvas>
+      </div>
     </div>
   `;
   
-  // Limpa a sidebar na home page
-  sidebar.innerHTML = `
-    <div class="navigation">
-      <!-- Botões "falsos" só para preencher espaço -->
-      <button class="nav-button" disabled style="opacity: 0; pointer-events: none;"></button>
+  // A sidebar da home pode ficar vazia ou ter outra info
+  sidebarContent.innerHTML = `
+    <div class="widget">
+      <h3>Bem-vindo!</h3>
+      <p>Este é seu dashboard. Use o menu "Cadernos" para organizar seus estudos.</p>
     </div>
   `;
 
+  // Renderiza o gráfico
   renderChart(tagData);
 }
 
 /**
- * Renderiza a "Página de Cadernos" (Seu Protótipo)
+ * Renderiza a página "Cadernos" (com cards e sidebar de formulários)
+ * @param {Array} notebooks - A lista de cadernos do storage
+ * @param {Array} allTags - A lista de todas as tags do Codeforces
  */
 export function renderNotebooksPage(notebooks, allTags) {
   const mainContent = document.getElementById('main-content');
-  const sidebar = document.getElementById('sidebar-content');
+  const sidebarContent = document.getElementById('sidebar-content');
 
-  // --- 1. CONTEÚDO PRINCIPAL (Grid de Cadernos) ---
-  let notebooksGridHTML = notebooks.map(nb => `
-    <div class="notebook-card" data-notebook-id="${nb.id}">
-      <h4>${nb.title}</h4>
-      <p>${nb.description || 'Sem descrição'}</p>
-      <span>${nb.problems.length} ${nb.problems.length === 1 ? 'questão' : 'questões'}</span>
-    </div>
-  `).join('');
-
-  // Mensagem se não houver cadernos
-  if (notebooks.length === 0) {
-    notebooksGridHTML = '<p>Nenhum caderno criado. Crie um na sidebar!</p>';
-  }
-
+  // 1. Renderiza o conteúdo principal (Cards dos Cadernos)
   mainContent.innerHTML = `
-    <div class="navigation">
-      <button id="nav-home" class="nav-button">Dashboard</button>
-      <button id="nav-notebooks" class="nav-button active">Cadernos</button>
+    <div class="page-header">
+      <h2>Meus Cadernos</h2>
+      <input type="search" id="search-notebook" placeholder="Pesquisar caderno ou questão...">
     </div>
-    <div class="search-bar">
-      <input type="text" placeholder="Pesquisar caderno // Questão...">
-    </div>
-    <div class="notebook-grid">
-      ${notebooksGridHTML}
+    <div id="notebook-list" class="notebook-grid">
+      ${notebooks.length === 0 
+        ? '<p>Nenhum caderno criado. Use o formulário ao lado para começar!</p>'
+        : notebooks.map(nb => `
+            <div class="notebook-card" data-notebook-id="${nb.id}">
+              <h3 class="notebook-title">${nb.title}</h3>
+              <p class="notebook-desc">${nb.description || 'Sem descrição'}</p>
+              <span class="notebook-count">${nb.problems.length} questões</span>
+            </div>
+          `).join('')
+      }
     </div>
   `;
 
-  // --- 2. SIDEBAR (Formulários) ---
+  // 2. Renderiza a Sidebar (Formulários)
   
-  // Gera as <option> para as tags
-  const tagsOptions = allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+  // Gera as <option> para o <select> de tags
+  const tagsOptions = allTags.map(tag => 
+    `<option value="${tag}">${tag}</option>`
+  ).join('');
   
-  // Gera as <option> para os cadernos
-  const notebookOptions = notebooks.map(nb => `<option value="${nb.id}">${nb.title}</option>`).join('');
+  // Gera as <option> para o <select> de cadernos
+  const notebookOptions = notebooks.map(nb => 
+    `<option value="${nb.id}">${nb.title}</option>`
+  ).join('');
 
-  sidebar.innerHTML = `
-    <div class="form-widget">
-      <h3><span class="balloons">🎈</span> Add Questão</h3>
+  sidebarContent.innerHTML = `
+    <!-- Formulário 1: Adicionar Questão -->
+    <div class="widget">
       <form id="new-problem-form">
-        <label for="q-title">Nome da Questão</label>
-        <input type="text" id="q-title" required>
+        <h3><i class="icon"></i> Add Questão</h3>
         
-        <label for="q-url">Link</label>
-        <input type="url" id="q-url" required>
+        <label for="q-title">Nome da Questão</label>
+        <input type="text" id="q-title" name="q-title" required>
+        
+        <label for="q-link">Link</label>
+        <input type="url" id="q-link" name="q-link" required>
         
         <label for="q-tags">Tags (Segure Ctrl/Cmd para selecionar)</label>
-        <!-- Este é o <select> padrão -->
-        <select id="q-tags" multiple>
+        <select id="q-tags" name="q-tags" multiple required>
           ${tagsOptions}
         </select>
         
         <label for="q-notebook">Caderno</label>
-        <select id="q-notebook" required ${notebooks.length === 0 ? 'disabled' : ''}>
-          ${notebooks.length === 0 ? '<option value="">Crie um caderno primeiro</option>' : notebookOptions}
+        <select id="q-notebook" name="q-notebook" required>
+          <option value="" disabled selected>Selecione um caderno...</option>
+          ${notebookOptions}
         </select>
         
-        <button ${notebooks.length === 0 ? 'disabled' : ''}>Add</button>
+        <button type="submit" class="btn btn-primary">Add</button>
       </form>
     </div>
     
-    <div class="form-widget">
-      <h3>Criar Caderno</h3>
+    <!-- Formulário 2: Criar Caderno -->
+    <div class="widget">
       <form id="new-notebook-form">
-        <label for="n-title">Nome</label>
-        <input type="text" id="n-title" required>
+        <h3><i class="icon"></i> Criar Caderno</h3>
         
-        <label for="n-desc">Descrição</label>
-        <input type="text" id="n-desc" placeholder="Ex: Problemas de DP">
+        <label for="nb-title">Nome</label>
+        <input type="text" id="nb-title" name="nb-title" required>
         
-        <button>Criar</button>
+        <label for="nb-desc">Descrição</label>
+        <input type="text" id="nb-desc" name="nb-desc" placeholder="Ex: Problemas de DP">
+        
+        <button type="submit" class="btn btn-primary">Criar</button>
       </form>
     </div>
     
-    <div class="form-widget">
-      <h3>Simulado</h3>
+    <!-- Formulário 3: Simulado -->
+    <div class="widget">
       <form id="new-simulado-form">
-        <label>Nome</label>
-        <input type="text" placeholder="Em breve...">
-        <label>Questões</label>
-        <input type="number" min="1" value="5" disabled>
-        <label>Tempo (min)</label>
-        <input type="number" min="10" value="120" step="10" disabled>
-        <label>Cadernos</label>
-        <select multiple disabled><option>Em breve...</option></select>
-        <button type="button" disabled>Criar (Em breve)</button>
+        <h3><i class="icon"></i> Simulado</h3>
+        <p>Selecione os cadernos, tempo e crie seu simulado.</p>
+        
+        <label for="s-tempo">Tempo (minutos)</label>
+        <input type="number" id="s-tempo" name="s-tempo" min="30" value="120">
+        
+        <!-- (Lógica de seleção de cadernos para o simulado virá depois) -->
+        
+        <button type="submit" class="btn">Criar Simulado</button>
       </form>
     </div>
   `;
-
-  // --- CHAMADA PARA initTagSelector() REMOVIDA ---
 }
 
 /**
- * Função auxiliar para renderizar o Chart.js
+ * Renderiza o gráfico de tags.
+ * @param {object} tagData - O objeto com contagem de tags
  */
-function renderChart(data) {
-  const canvas = document.getElementById('tagsChart');
-  if (!canvas) return; // Se a tela mudou, não faz nada
-  
-  const ctx = canvas.getContext('2d');
-  
-  // Destrói gráfico anterior, se existir
-  let existingChart = Chart.getChart(ctx);
+export function renderChart(tagData) {
+  const ctx = document.getElementById('tags-chart');
+  if (!ctx) return; // Sai se o canvas não estiver na página
+
+  // Destrói gráfico antigo, se houver, para evitar bugs
+  const existingChart = Chart.getChart(ctx);
   if (existingChart) {
     existingChart.destroy();
   }
-  
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-  
+
+  // Gera cores aleatórias para o gráfico
+  const labels = Object.keys(tagData);
+  const data = Object.values(tagData);
+  const backgroundColors = labels.map(() => 
+    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`
+  );
+
   new Chart(ctx, {
-    type: 'bar',
+    type: 'bar', // Tipo de gráfico
     data: {
       labels: labels,
       datasets: [{
-        label: 'Submissões OK por Tag',
-        data: values,
-        backgroundColor: '#3498db',
-        borderRadius: 4,
+        label: '# de Problemas Resolvidos',
+        data: data,
+        backgroundColor: backgroundColors,
+        borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+        borderWidth: 1
       }]
     },
     options: {
@@ -184,14 +215,61 @@ function renderChart(data) {
         y: {
           beginAtZero: true
         }
-      },
-      plugins: {
-        legend: {
-          display: false
-        }
       }
     }
   });
 }
 
-// --- FUNÇÃO initTagSelector() REMOVIDA ---
+/**
+ * Mostra o modal com os detalhes de um caderno.
+ * @param {object} notebook - O objeto do caderno (vindo do storage)
+ */
+export function showNotebookModal(notebook) {
+  const modal = document.getElementById('notebook-modal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  
+  // 1. Popula o título
+  modalTitle.textContent = notebook.title;
+  
+  // 2. Popula o corpo com a lista de problemas
+  if (notebook.problems.length === 0) {
+    modalBody.innerHTML = '<p>Nenhum problema adicionado a este caderno ainda.</p>';
+  } else {
+    modalBody.innerHTML = `
+      <ul class="problem-list">
+        ${notebook.problems.map(problem => `
+          <li class="problem-list-item">
+            <a href="${problem.url}" target="_blank" rel="noopener noreferrer">
+              ${problem.title}
+            </a>
+            <div class="problem-tags">
+              ${problem.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+  }
+  
+  // 3. Mostra o modal
+  modal.classList.remove('hidden');
+}
+
+/**
+ * Esconde o modal.
+ */
+// --- CORREÇÃO AQUI ---
+export function hideNotebookModal() {
+  const modal = document.getElementById('notebook-modal');
+  if (!modal) return; // Proteção
+  
+  modal.classList.add('hidden');
+  
+  // Limpa o conteúdo para a próxima vez
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  
+  if(modalTitle) modalTitle.textContent = '';
+  if(modalBody) modalBody.innerHTML = '';
+}

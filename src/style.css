@@ -1,246 +1,328 @@
-/* --- GERAL --- */
+/* --- 1. CONFIGURAÇÕES GLOBAIS (Variáveis e Reset) --- */
 :root {
-  --primary-color: #3498db;
+  --primary-color: #007bff;
   --bg-color: #f4f7f6;
   --widget-bg: #ffffff;
   --text-color: #333;
   --border-color: #e0e0e0;
-  --white: #fff;
-  --header-height: 60px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  margin: 0;
   background-color: var(--bg-color);
   color: var(--text-color);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- LAYOUT PRINCIPAL --- */
-header {
-  height: var(--header-height);
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- 2. LAYOUT PRINCIPAL (Header e Container) --- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
   background-color: var(--widget-bg);
   border-bottom: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  padding: 0 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.menu-icon {
-  cursor: pointer;
-  fill: #555;
-}
-
-.logo-title {
+.logo-text {
   font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.balloons {
-  font-size: 1.25rem;
-  cursor: help;
-}
-
-.container {
-  display: flex;
-  max-width: 1400px;
-  margin: 1.5rem auto;
-  gap: 1.5rem;
-  padding: 0 1.5rem;
-}
-
-main {
-  flex: 2; /* Ocupa 2/3 do espaço */
-}
-
-aside {
-  flex: 1; /* Ocupa 1/3 do espaço */
-  position: sticky;
-  top: calc(var(--header-height) + 1.5rem); /* Trava a sidebar */
-  align-self: flex-start; /* Impede que estique */
-}
-
-/* --- NAVEGAÇÃO (Tabs) --- */
-.navigation {
-  display: flex;
-  gap: 0.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .nav-button {
   font-size: 1rem;
   font-weight: 500;
-  padding: 0.75rem 1.25rem;
-  border: 1px solid var(--border-color);
-  background-color: var(--widget-bg);
-  color: var(--text-color);
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  color: #555;
   cursor: pointer;
+  border-radius: 6px;
   transition: all 0.2s ease;
 }
-
+.nav-button:hover {
+  background-color: #f0f0f0;
+}
 .nav-button.active {
   background-color: var(--primary-color);
-  color: var(--white);
-  border-color: var(--primary-color);
+  color: white;
 }
 
-.nav-button:not(.active):hover {
-  background-color: #f9f9f9;
+.container {
+  display: flex;
+  flex: 1; /* Ocupa o resto da altura */
+  padding: 2rem;
+  gap: 2rem;
 }
 
-/* --- PÁGINA HOME (Gráfico) --- */
-.chart-container {
+main {
+  flex: 3; /* 3/4 do espaço */
+}
+
+aside {
+  flex: 1; /* 1/4 do espaço */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+/* --- 3. COMPONENTES (Widgets, Forms, Gráficos) --- */
+
+/* Widget (bloco branco) */
+.widget {
   background-color: var(--widget-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+}
+
+/* Estilos dos Formulários da Sidebar */
+.widget form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.widget form h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+.widget form label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #444;
+  margin-bottom: -0.5rem; /* Puxa o label para perto do input */
+}
+.widget form input[type="text"],
+.widget form input[type="url"],
+.widget form input[type="number"],
+.widget form input[type="search"],
+.widget form select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* Botões */
+.btn {
+  font-size: 1rem;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  background-color: #e0e0e0;
+  color: #333;
+  transition: all 0.2s ease;
+}
+.btn:hover {
+  background-color: #d0d0d0;
+}
+.btn.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+.btn.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Seletor de Múltiplas Tags (Revertido) */
+select[multiple] {
+  min-height: 120px;
+  background-color: #fafafa;
+}
+select[multiple] option {
+  padding: 0.5rem;
+}
+select[multiple] option:checked {
+  background: var(--primary-color);
+  color: white;
+}
+
+
+/* Gráfico (Dashboard) */
+.chart-container {
+  position: relative;
   height: 400px;
 }
 
-/* --- PÁGINA CADERNOS (Grid) --- */
-.search-bar {
-  margin-bottom: 1.5rem;
-}
-
-.search-bar input {
-  width: 100%;
-  font-size: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  box-sizing: border-box; /* Garante que o padding não quebre o layout */
-}
-
+/* --- 4. PÁGINA "CADERNOS" (Grid de Cards) --- */
 .notebook-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
 }
 
 .notebook-card {
   background-color: var(--widget-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.03);
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .notebook-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transform: translateY(-2px);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.05);
+  border-color: var(--primary-color);
+}
+.notebook-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+.notebook-desc {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+  min-height: 2.5em; /* Garante altura mínima para alinhamento */
+}
+.notebook-count {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
 }
 
-.notebook-card h4 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
+/* --- 5. MODAL (Janela Flutuante) --- */
+
+/* Classe utilitária para esconder */
+.hidden {
+  display: none !important;
+}
+
+/* O fundo escuro */
+.modal-backdrop {
+  position: fixed; /* Cobre a tela inteira */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Preto semi-transparente */
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* A "janela" branca do modal */
+.modal-content {
+  background-color: var(--widget-bg);
+  border-radius: 8px;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 600px; /* Largura máxima */
+  max-height: 80vh; /* Altura máxima */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
   color: var(--primary-color);
 }
 
-.notebook-card p {
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
-  color: #555;
-  height: 40px; /* Define altura fixa para descrição */
-  overflow: hidden;
-}
-
-.notebook-card span {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #777;
-}
-
-/* --- PÁGINA CADERNOS (Sidebar) --- */
-.form-widget {
-  background-color: var(--widget-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.5rem;
-}
-
-.form-widget + .form-widget {
-  margin-top: 1.5rem; /* Espaçamento entre os widgets */
-}
-
-.form-widget h3 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.form-widget form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-widget label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: -0.5rem; /* Puxa o label para perto do input */
-}
-
-.form-widget input,
-.form-widget select,
-.form-widget button {
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  padding: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  box-sizing: border-box; /* Garante padding consistente */
-  width: 100%;
-}
-
-.form-widget button {
-  background-color: var(--primary-color);
-  color: var(--white);
-  font-weight: 600;
+.modal-close {
+  font-family: Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  border: none;
+  background: none;
+  color: #aaa;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  padding: 0;
+}
+.modal-close:hover {
+  color: #333;
 }
 
-.form-widget button:hover {
-  background-color: #2980b9;
+.modal-body {
+  overflow-y: auto; /* Adiciona scroll se a lista for longa */
 }
 
-.form-widget button:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
+/* Lista de Problemas dentro do Modal */
+.problem-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-/* --- ESTILOS DO SELECT[MULTIPLE] (ADICIONADOS DE VOLTA) --- */
-.form-widget select[multiple] {
-  height: 150px; /* Define uma altura fixa */
-  padding: 0.5rem; /* Padding interno */
-  background-color: var(--white);
+.problem-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.form-widget select[multiple] option {
-  padding: 0.5rem;
-}
-.form-widget select[multiple] option:checked {
-  background-color: var(--primary-color);
-  color: var(--white);
+.problem-list-item:last-child {
+  border-bottom: none;
 }
 
+.problem-list-item a {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
 
-/* --- (ESTILOS DO SLIM-SELECT FORAM REMOVIDOS) --- */
+.problem-list-item a:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.problem-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap; /* Quebra a linha se tiver muitas tags */
+}
+
+.problem-tags .tag {
+  font-size: 0.8rem;
+  background-color: var(--bg-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #555;
+}

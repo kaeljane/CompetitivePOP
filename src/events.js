@@ -1,73 +1,95 @@
-import { addNotebook, addProblem } from './storage.js';
+import { addNotebook, addProblem, getNotebookById } from './storage.js';
+import { showNotebookModal, hideNotebookModal } from './ui.js';
 
 /**
- * Registra todos os listeners da aplicação.
- * Usa delegação de eventos para 'click' e 'submit'
- * @param {function} navigateTo - Função para trocar de página (de main.js)
- * @param {function} renderCurrentPage - Função para re-renderizar a view (de main.js)
+ * Registra todos os listeners de eventos da aplicação
  */
 export function registerEventListeners(navigateTo, renderCurrentPage) {
   
-  // Listener genérico para cliques (Navegação)
-  document.addEventListener('click', (event) => {
+  // Listener de 'submit' (para todos os formulários)
+  document.addEventListener('submit', (e) => {
+    // Previne o recarregamento da página
+    e.preventDefault(); 
     
-    // Navegação HOME
-    if (event.target.id === 'nav-home') {
+    // Pega o ID do formulário
+    const formId = e.target.id;
+
+    // --- CASO 1: Criar novo caderno ---
+    if (formId === 'new-notebook-form') {
+      const form = e.target;
+      const title = form.elements['nb-title'].value;
+      const description = form.elements['nb-desc'].value;
+
+      if (!title) {
+        alert('Por favor, dê um nome ao caderno.'); // Vamos trocar isso por um modal depois
+        return;
+      }
+
+      addNotebook(title, description);
+      form.reset(); // Limpa o formulário
+      renderCurrentPage(); // Atualiza a UI para mostrar o novo caderno
+    }
+
+    // --- CASO 2: Adicionar nova questão ---
+    if (formId === 'new-problem-form') {
+      const form = e.target;
+      const title = form.elements['q-title'].value;
+      const url = form.elements['q-link'].value;
+      const notebookId = form.elements['q-notebook'].value;
+      
+      // --- LÓGICA CORRETA PARA LER O <select multiple> ---
+      const tagsElement = form.elements['q-tags'];
+      const selectedTags = Array.from(tagsElement.selectedOptions)
+                                .map(option => option.value);
+      // --- FIM DA LÓGICA ---
+
+      if (!title || !url || !notebookId) {
+        alert('Preencha todos os campos da questão.');
+        return;
+      }
+      
+      // Adiciona o problema no storage
+      addProblem(notebookId, title, url, selectedTags);
+      
+      form.reset(); // Limpa o formulário "Add Questão"
+      renderCurrentPage(); // Re-renderiza a página (para atualizar a contagem de "X questões")
+    }
+    
+    // --- CASO 3: Criar simulado (Placeholder) ---
+    if (formId === 'new-simulado-form') {
+      alert('Funcionalidade de Simulado ainda não implementada!');
+    }
+  }); // Fim do listener 'submit'
+  
+  // Listener de 'click' (para navegação e modal)
+  document.addEventListener('click', (e) => {
+    const target = e.target; // O elemento exato que foi clicado
+    
+    // --- 1. NAVEGAÇÃO ---
+    if (target.id === 'nav-home') {
+      e.preventDefault();
       navigateTo('home');
     }
-    
-    // Navegação CADERNOS
-    if (event.target.id === 'nav-notebooks') {
+    if (target.id === 'nav-notebooks') {
+      e.preventDefault();
       navigateTo('notebooks');
     }
-  });
-
-  // Listener genérico para formulários
-  document.addEventListener('submit', (event) => {
     
-    // CASO 1: Formulário CRIAR CADERNO
-    if (event.target.id === 'new-notebook-form') {
-      event.preventDefault(); 
-      const title = document.getElementById('nb-nome').value;
-      const description = document.getElementById('nb-desc').value;
-
-      if (title) {
-        addNotebook(title, description); 
-        renderCurrentPage(); // Re-renderiza a página de cadernos para mostrar o novo
+    // --- 2. ABRIR MODAL ---
+    // closest() verifica se o clique foi *dentro* de um notebook-card
+    const clickedCard = target.closest('.notebook-card');
+    if (clickedCard) {
+      const notebookId = clickedCard.dataset.notebookId;
+      const notebook = getNotebookById(notebookId);
+      if (notebook) {
+        showNotebookModal(notebook);
       }
     }
     
-    // CASO 2: Formulário ADD QUESTÃO
-    if (event.target.id === 'add-question-form') {
-      event.preventDefault(); 
-      
-      const title = document.getElementById('q-nome').value;
-      const url = document.getElementById('q-link').value;
-      // --- ATUALIZE AQUI ---
-      const tagsElement = document.getElementById('q-tags');
-      // Pega todos os options selecionados, transforma em array, e pega o .value de cada um
-      const tags = Array.from(tagsElement.selectedOptions).map(option => option.value);
-      // --- FIM DA ATUALIZAÇÃO ---
-      const notebookId = document.getElementById('q-caderno').value;
-
-      if (title && url && notebookId) {
-        addProblem(notebookId, title, url, tags);
-        // Não precisa re-renderizar, pois a sidebar não muda
-        // Mas podemos re-renderizar para atualizar o <select> no futuro
-        // Por agora, vamos re-renderizar para atualizar o card (contagem de questões)
-        renderCurrentPage(); 
-        
-        // Limpar o formulário
-        event.target.reset();
-      } else if (!notebookId) {
-        alert("Por favor, crie um caderno antes de adicionar uma questão!");
-      }
+    // --- 3. FECHAR MODAL ---
+    // Fecha se clicar no 'X' ou no fundo escuro (backdrop)
+    if (target.id === 'modal-close-btn' || target.id === 'notebook-modal') {
+      hideNotebookModal();
     }
-
-    // CASO 3: Formulário Simulado (não faz nada)
-    if (event.target.id === 'simulado-form') {
-      event.preventDefault();
-      alert("Funcionalidade de Simulado em construção!");
-    }
-  });
+  }); // Fim do listener 'click'
 }
