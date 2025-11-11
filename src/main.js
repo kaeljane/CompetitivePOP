@@ -1,74 +1,74 @@
-import './style.css';
-// --- LINHA DO 'slim-select' REMOVIDA ---
+import './style.css'; 
+// (O import do slim-select foi removido, o que está correto)
 import { fetchUserSubmissions, CODEFORCES_TAGS } from './api.js';
-import { renderAppShell, renderHomePage, renderNotebooksPage } from './ui.js';
+import { 
+  renderAppShell, 
+  renderHomePage, 
+  renderNotebooksPage 
+} from './ui.js';
 import { registerEventListeners } from './events.js';
 import { getStorage } from './storage.js';
 
-// Variável global para o estado da página
+// Estado global simples para a página atual
 let currentPage = 'home';
-let appData = getStorage();
 
 /**
- * Processa os dados da API para o gráfico
+ * Processa as submissões falsas para contar as tags.
+ * @returns {object} Um objeto com a contagem de cada tag
  */
-function processTagData(submissions) {
+function processSubmissions() {
+  const submissions = fetchUserSubmissions('mock_user');
+  
   const tagCounts = submissions
-    .flatMap(sub => sub.problem.tags)
+    .flatMap(sub => sub.problem.tags) // Pega todas as tags
     .reduce((acc, tag) => {
-      acc[tag] = (acc[tag] || 0) + 1;
+      acc[tag] = (acc[tag] || 0) + 1; // Conta a frequência
       return acc;
-    }, {});
+    }, {}); // Inicia com um objeto vazio
+
   return tagCounts;
 }
 
 /**
- * Função principal de navegação
+ * Roteador principal: Renderiza a página correta no DOM.
+ * @param {string} page - O nome da página ('home' or 'notebooks')
  */
-function navigateTo(page) {
+export function navigateTo(page) {
   currentPage = page;
-  renderCurrentPage();
+  
+  const tagData = processSubmissions();
+  const storageData = getStorage();
+
+  if (page === 'home') {
+    renderHomePage(tagData);
+  } else if (page === 'notebooks') {
+    renderNotebooksPage(storageData.notebooks, CODEFORCES_TAGS);
+  } else {
+    // Página padrão (fallback)
+    renderHomePage(tagData);
+  }
 }
 
 /**
- * Função principal de renderização
+ * Ponto de entrada da aplicação.
  */
-function renderCurrentPage() {
-  // Atualiza os dados do storage toda vez que renderiza
-  appData = getStorage();
-  
-  const mainContent = document.getElementById('main-content');
-  const sidebar = document.getElementById('sidebar-content');
-
-  if (!mainContent || !sidebar) {
-    console.error("Erro: Elementos 'main-content' ou 'sidebar-content' não encontrados.");
-    return;
-  }
-
-  if (currentPage === 'home') {
-    const submissions = fetchUserSubmissions('mock_user');
-    const tagData = processTagData(submissions);
-    renderHomePage(tagData);
-  } else if (currentPage === 'notebooks') {
-    // Passa a lista de tags e os cadernos para a UI
-    renderNotebooksPage(appData.notebooks, CODEFORCES_TAGS);
-  }
-}
-
-// --- PONTO DE ENTRADA ---
-document.addEventListener('DOMContentLoaded', () => {
+function initializeApp() {
   const appElement = document.getElementById('app');
   if (!appElement) {
-    console.error("Erro fatal: Elemento '#app' não encontrado.");
+    console.error("Erro fatal: Elemento #app não encontrado.");
     return;
   }
   
-  // 1. Renderiza o "esqueleto" do app
+  // 1. Desenha o "esqueleto" do app (header, main, aside)
   renderAppShell(appElement);
   
-  // 2. Renderiza a página inicial (Home)
-  navigateTo('home');
+  // 2. Registra os "escutadores" de eventos (cliques, submits)
+  // --- CORREÇÃO: PASSA A FUNÇÃO 'navigateTo' ---
+  registerEventListeners(navigateTo);
   
-  // 3. Registra todos os listeners
-  registerEventListeners(navigateTo, renderCurrentPage);
-});
+  // 3. Navega para a página inicial (home)
+  navigateTo('home');
+}
+
+// Inicia a aplicação quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', initializeApp);
