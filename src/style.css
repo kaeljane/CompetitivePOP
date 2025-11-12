@@ -44,12 +44,19 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  /* --- ESPAÇAMENTO CORRIGIDO --- */
+  padding: 1rem 1.5rem; 
   background-color: var(--color-widget-bg);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
+  height: 65px; 
+  
+  /* Centraliza o conteúdo do header */
+  width: 100%;
+  max-width: 1300px; 
+  margin: 0 auto; /* Centraliza o header */
 }
 
 .logo-container {
@@ -58,7 +65,6 @@ body {
   gap: 1rem;
 }
 
-/* --- NOVO: Estilo para o Ícone de Menu --- */
 .hamburger-icon {
   width: 24px;
   height: 24px;
@@ -95,15 +101,49 @@ body {
 }
 
 /* --- 3. Layout Principal (Container) --- */
+
+/* --- CORREÇÃO DO SELETOR (ID) E ESPAÇAMENTO --- */
+#page-header-container {
+  padding: 0 1.5rem; /* Espaçamento lateral */
+  
+  max-width: 1300px; 
+  width: 100%;
+  margin: 0 auto; /* Centraliza */
+  
+  position: sticky;
+  top: 65px; 
+  background-color: var(--color-background);
+  z-index: 99;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap; 
+  padding: 1.5rem 0; 
+  min-height: 90px; 
+}
+
+.page-header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
 .container {
   display: grid;
-  grid-template-columns: 1fr 400px; /* Coluna principal flexível, sidebar fixa */
+  grid-template-columns: 1fr 400px; 
   gap: 1.5rem;
-  padding: 1.5rem;
-  flex: 1; /* Faz o container crescer para ocupar o espaço */
-  max-width: 1600px;
+  /* --- ESPAÇAMENTO CORRIGIDO --- */
+  padding: 1.5rem 1.5rem; 
+  
+  flex: 1; 
+  max-width: 1300px; 
   width: 100%;
-  margin: 0 auto;
+  margin: 0 auto; /* Centraliza */
 }
 
 main {
@@ -117,27 +157,15 @@ aside {
   flex-direction: column;
   gap: 1.5rem;
   position: sticky;
-  top: 80px; /* Altura do header + padding */
-  height: calc(100vh - 100px); /* Altura da tela menos o header */
-  overflow-y: auto; /* Adiciona scroll se a sidebar for muito grande */
+  top: calc(65px + 90px + 1.5rem); 
+  height: calc(100vh - (65px + 90px + 3rem)); 
+  overflow-y: auto; 
+  align-self: start; 
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
-}
-
-.page-header h2 {
-  font-size: 2rem;
-  font-weight: 700;
-}
 
 /* --- 4. Componentes (Widgets, Cards, Formulários) --- */
 
-/* Widget (Caixa branca) */
 .widget {
   background-color: var(--color-widget-bg);
   border: 1px solid var(--color-border);
@@ -151,9 +179,37 @@ aside {
   margin-bottom: 1rem;
 }
 
+/* Estilos para "Estatísticas Rápidas" */
+.quick-stats .stat-item {
+  display: flex;
+  flex-direction: column; 
+  align-items: center; 
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quick-stats .stat-item:last-child {
+  border-bottom: none;
+}
+
+.quick-stats .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.25rem; 
+  line-height: 1.2;
+}
+
+.quick-stats .stat-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+
 /* Barra de Pesquisa */
 #search-notebook {
-  padding: 0.75rem 1rem 0.75rem 2.5rem; /* Espaço à esquerda para o ícone */
+  padding: 0.75rem 1rem 0.75rem 2.5rem; 
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.95rem;
@@ -161,7 +217,6 @@ aside {
   max-width: 350px;
   transition: border-color 0.2s, box-shadow 0.2s;
   
-  /* --- NOVO: Ícone de Lupa (SVG) --- */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 1rem center;
@@ -207,7 +262,7 @@ aside {
   font-size: 0.95rem;
   color: var(--color-text-muted);
   margin-bottom: 1rem;
-  min-height: 20px; /* Garante altura mesmo sem descrição */
+  min-height: 20px; 
 }
 
 .notebook-count {
@@ -226,7 +281,7 @@ form {
 form label {
   font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: -0.5rem; /* Aproxima o label do input */
+  margin-bottom: -0.5rem; 
 }
 
 form input[type="text"],
@@ -252,7 +307,7 @@ form select:focus {
 /* Seletor Múltiplo de Tags */
 select[multiple] {
   padding: 0.5rem;
-  height: 120px; /* Altura fixa */
+  height: 120px; 
   background-color: #fff;
 }
 
@@ -294,13 +349,13 @@ select[multiple] option:checked {
 .btn-primary:hover {
   background-color: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
-  filter: brightness(1); /* Reseta o filtro para o botão primário */
+  filter: brightness(1); 
 }
 
 /* --- 5. Modal (Janela Flutuante) --- */
 .modal-backdrop {
   position: fixed;
-  inset: 0; /* (top, bottom, left, right = 0) */
+  inset: 0; 
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -365,9 +420,9 @@ select[multiple] option:checked {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-height: 50vh; /* Limita a altura e adiciona scroll */
+  max-height: 50vh; 
   overflow-y: auto;
-  padding-right: 0.5rem; /* Espaço para o scrollbar */
+  padding-right: 0.5rem; 
 }
 
 .problem-list-item {
@@ -397,7 +452,10 @@ select[multiple] option:checked {
 
 .problem-tags {
   display: flex;
+  flex-wrap: wrap; 
   gap: 0.5rem;
+  justify-content: flex-end; 
+  max-width: 50%; 
 }
 
 .tag {
@@ -407,15 +465,93 @@ select[multiple] option:checked {
   color: var(--color-text-muted);
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
+  white-space: nowrap; 
 }
 
 /* --- 6. Gráfico (Dashboard) --- */
 
-/* --- NOVO: Limita o tamanho do gráfico --- */
 .chart-container {
   position: relative;
   width: 100%;
-  max-width: 900px; /* Limita a largura máxima */
-  height: 450px; /* Altura fixa */
-  margin: 1.5rem auto 0 auto; /* Centraliza e adiciona margem */
-}     
+  max-width: 900px; 
+  height: 450px; 
+  margin: 1.5rem auto 0 auto; 
+}
+
+
+/* --- 7. Responsividade (Telas Pequenas) --- */
+
+/* Este 'breakpoint' (900px) é onde o layout de 2 colunas quebra */
+@media (max-width: 900px) {
+
+  /* 1. Layout: Mudar de 2 colunas para 1 coluna */
+  .container {
+    grid-template-columns: 1fr; /* Força 1 coluna */
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* 2. Sidebar: Tira o 'sticky' e 'height' */
+  aside {
+    position: static; /* Remove o 'sticky' */
+    height: auto; /* Deixa a altura ser automática */
+    overflow-y: visible; /* Remove o scroll interno */
+    top: auto;
+  }
+  
+  /* 3. Cabeçalho: Empilha o logo e os links */
+  .app-header {
+    flex-direction: column; /* Empilha o logo e os links de navegação */
+    height: auto; /* Altura automática */
+    gap: 0.5rem;
+    padding: 1rem;
+    max-width: 100%; /* Ocupa 100% no celular */
+  }
+  
+  .nav-links {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.5rem;
+  }
+  
+  .nav-button {
+    flex: 1; /* Faz os botões ocuparem espaço igual */
+    text-align: center;
+  }
+
+  /* 4. Cabeçalho da Página: Empilha o título e a pesquisa */
+  #page-header-container {
+    position: static; /* Deixa de ser 'sticky' no celular */
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column; /* Empilha o título e a barra */
+    align-items: flex-start; /* Alinha tudo à esquerda */
+    gap: 1rem;
+    padding: 1rem 0;
+    min-height: auto;
+  }
+  
+  .page-header h2 {
+    font-size: 1.5rem; /* Título menor no celular */
+  }
+  
+  #search-notebook {
+    max-width: 100%; /* Barra de pesquisa ocupa 100% */
+  }
+  
+  /* 5. Gráfico: Reduz a altura no celular */
+  .chart-container {
+    height: 300px;
+  }
+  
+  /* 6. Modal: Ocupa a tela inteira */
+  .modal-content {
+    max-width: 95%;
+    max-height: 90vh;
+  }
+}

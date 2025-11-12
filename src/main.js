@@ -1,82 +1,122 @@
-import './style.css'; 
-// Importamos o getStorage para ler os dados reais
-import { getStorage } from './storage.js';
-// Não precisamos mais do fetchUserSubmissions, então o removemos
+import './style.css';
 import { CODEFORCES_TAGS } from './api.js';
+import { getStorage } from './storage.js'; 
 import { 
   renderAppShell, 
   renderHomePage, 
-  renderNotebooksPage 
+  renderNotebooksPage, 
+  renderChart 
 } from './ui.js';
 import { registerEventListeners } from './events.js';
 
-// Estado global simples para a página atual
-let currentPage = 'home';
-
 /**
- * Processa as submissões reais dos cadernos do usuário.
- * @returns {object} Um objeto com a contagem de cada tag
+ * Processa as submissões para contar as tags.
+ * LÊ DO LOCALSTORAGE
+ * @returns {object} Um objeto com contagens de tags (ex: { dp: 5, graphs: 3 })
  */
 function processSubmissions() {
-  // 1. Pega os dados REAIS do LocalStorage
-  const { notebooks } = getStorage();
-  
-  // 2. Usa .flatMap() para pegar todas as tags de todos os problemas
-  const allTags = notebooks
-    .flatMap(notebook => notebook.problems) // Pega todos os problemas de todos os cadernos
-    .flatMap(problem => problem.tags); // Pega todas as tags de todos os problemas
-  
-  // allTags agora é um array gigante com todas as tags, ex: ["dp", "graphs", "dp", "math"]
+  const { notebooks } = getStorage(); // Pega os dados reais
+  const tagCounts = {};
 
-  // 3. Conta a frequência das tags (exatamente como antes)
-  const tagCounts = allTags.reduce((acc, tag) => {
-    acc[tag] = (acc[tag] || 0) + 1; // Conta a frequência
-    return acc;
-  }, {}); // Inicia com um objeto vazio
+  // Itera por todos os cadernos
+  notebooks.forEach(notebook => {
+    // Itera por todos os problemas em cada caderno
+    notebook.problems.forEach(problem => {
+      // Itera por todas as tags em cada problema
+      problem.tags.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+  });
 
   return tagCounts;
 }
 
 /**
- * Roteador principal: Renderiza a página correta no DOM.
- * @param {string} page - O nome da página ('home' or 'notebooks')
+ * Calcula as estatísticas rápidas para a sidebar.
+ * @returns {object}
  */
-export function navigateTo(page) {
-  currentPage = page;
+function getQuickStats() {
+  const { notebooks } = getStorage();
+  const totalNotebooks = notebooks.length;
   
-  // Agora esta função usa os dados reais!
-  const tagData = processSubmissions();
-  const storageData = getStorage();
+  let totalProblems = 0;
+  const allTags = [];
 
-  if (page === 'home') {
-    renderHomePage(tagData);
-  } else if (page === 'notebooks') {
-    renderNotebooksPage(storageData.notebooks, CODEFORCES_TAGS);
-  } else {
-    // Página padrão (fallback)
-    renderHomePage(tagData);
+  notebooks.forEach(nb => {
+    totalProblems += nb.problems.length;
+    nb.problems.forEach(prob => {
+      allTags.push(...prob.tags);
+    });
+  });
+
+  let mostCommonTag = 'N/A';
+  if (allTags.length > 0) {
+    const tagCounts = allTags.reduce((acc, tag) => {
+      acc[tag] = (acc[tag] || 0) + 1;
+      return acc;
+    }, {});
+    
+    mostCommonTag = Object.keys(tagCounts).reduce((a, b) => 
+      tagCounts[a] > tagCounts[b] ? a : b
+    );
   }
+
+  return { totalNotebooks, totalProblems, mostCommonTag };
 }
+
 
 /**
- * Ponto de entrada da aplicação.
+ * Navega para uma página diferente no app (SPA)
+ * @param {string} page - O nome da página ('home' or 'notebooks')
  */
-function initializeApp() {
-  const appElement = document.getElementById('app');
-  if (!appElement) {
-    console.error("Erro fatal: Elemento #app não encontrado.");
-    return;
+function navigateTo(page) {
+  const data = getStorage();
+  
+  // --- MUDANÇA AQUI ---
+  // Pega o novo container do cabeçalho da página
+  const headerContainer = document.getElementById('page-header-container');
+  if (!headerContainer) return;
+  // --- Fim da mudança ---
+
+  
+  if (page === 'home') {
+    // 1. Injeta o Título da Página Home
+    headerContainer.innerHTML = `
+      <div class="page-header">
+        <h2>Dashboard de Performance</h2>
+      </div>
+    `;
+    
+    // 2. Renderiza o conteúdo da página home
+    const quickStats = getQuickStats(); // Calcula as estatísticas
+    renderHomePage(quickStats); // Passa as estatísticas
+    
+    // 3. Renderiza o gráfico
+    setTimeout(() => {
+      const tagCounts = processSubmissions();
+      renderChart(tagCounts);
+    }, 0);
+    
+  } else if (page === 'notebooks') {
+    // 1. Injeta o Título e a Barra de Pesquisa da Página Cadernos
+    headerContainer.innerHTML = `
+      <div class="page-header">
+        <h2>Meus Cadernos</h2>
+        <input type="text" id="search-notebook" placeholder="Pesquisar Caderno">
+      </div>
+    `;
+    
+    // 2. Renderiza o conteúdo da página cadernos
+    renderNotebooksPage(data.notebooks, CODEFORCES_TAGS);
   }
-  
-  // 1. Desenha o "esqueleto" do app (header, main, aside)
-  renderAppShell(appElement);
-  
-  // 2. Registra os "escutadores" de eventos (cliques, submits)
-  registerEventListeners(navigateTo);
-  
-  // 3. Navega para a página inicial (home)
-  navigateTo('home');
 }
 
-// Inicia a aplicação quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', initializeApp);
+// 1. Renderiza o "esqueleto" do app
+renderAppShell();
+
+// 2. Registra todos os event listeners (passando a função de navegação)
+registerEventListeners(navigateTo);
+
+// 3. Navega para a página inicial (Home) por padrão
+navigateTo('home');
