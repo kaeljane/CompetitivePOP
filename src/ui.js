@@ -1,7 +1,6 @@
 import Chart from 'chart.js/auto';
 
-// --- NOVO: Paleta de Cores Pré-definida ---
-// Uma paleta de cores bonita para o gráfico, em vez de cores aleatórias
+// Paleta de Cores Pré-definida
 const CHART_COLORS = [
   'rgba(54, 162, 235, 0.8)', // Blue
   'rgba(75, 192, 192, 0.8)', // Green
@@ -20,11 +19,15 @@ const CHART_COLORS = [
  * @param {HTMLElement} appElement - O elemento <div id="app">
  */
 export function renderAppShell(appElement) {
-  // O código da renderAppShell permanece o mesmo
   appElement.innerHTML = `
     <header class="app-header">
       <div class="logo-container">
-        <!-- SVG ou <img> da logo aqui -->
+        
+        <!-- --- NOVO: Ícone de Menu (Três Barras) --- -->
+        <svg class="hamburger-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+          <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/>
+        </svg>
+        
         <span class="logo-text">CompetitivePOP</span>
       </div>
       <nav>
@@ -72,6 +75,7 @@ export function renderHomePage(tagData) {
     <div class="widget">
       <h3>Análise de Tópicos (Weakness Panel)</h3>
       
+      <!-- --- TEXTO ATUALIZADO --- -->
       <p>Contagem de tags de todos os seus cadernos</p>
 
       <div class="chart-container">
@@ -80,7 +84,6 @@ export function renderHomePage(tagData) {
     </div>
   `;
   
-  // A sidebar da home pode ficar vazia ou ter outra info
   sidebarContent.innerHTML = `
     <div class="widget">
       <h3>Bem-vindo!</h3>
@@ -88,7 +91,6 @@ export function renderHomePage(tagData) {
     </div>
   `;
 
-  // Renderiza o gráfico
   renderChart(tagData);
 }
 
@@ -98,34 +100,29 @@ export function renderHomePage(tagData) {
  * @param {Array} allTags - A lista de todas as tags do Codeforces
  */
 export function renderNotebooksPage(notebooks, allTags) {
-  // O código da renderNotebooksPage permanece o mesmo
   const mainContent = document.getElementById('main-content');
   const sidebarContent = document.getElementById('sidebar-content');
 
-  // 1. Renderiza o conteúdo principal (AGORA COM A LISTA VAZIA)
   mainContent.innerHTML = `
     <div class="page-header">
       <h2>Meus Cadernos</h2>
       
+      <!-- --- PLACEHOLDER ATUALIZADO --- -->
       <input type="search" id="search-notebook" placeholder="Pesquisar Caderno">
 
     </div>
-    <!-- A lista agora começa vazia e será preenchida pela renderNotebookList -->
     <div id="notebook-list" class="notebook-grid"></div>
   `;
   
-  // 2. Chama a nova função para preencher a lista
   renderNotebookList(notebooks);
 
 
-  // 3. Renderiza a Sidebar (Formulários)
+  // Renderiza a Sidebar (Formulários)
   
-  // Gera as <option> para o <select> de tags
   const tagsOptions = allTags.map(tag => 
     `<option value="${tag}">${tag}</option>`
   ).join('');
   
-  // Gera as <option> para o <select> de cadernos
   const notebookOptions = notebooks.map(nb => 
     `<option value="${nb.id}">${nb.title}</option>`
   ).join('');
@@ -134,7 +131,9 @@ export function renderNotebooksPage(notebooks, allTags) {
     <!-- Formulário 1: Adicionar Questão -->
     <div class="widget">
       <form id="new-problem-form">
-        <h3><i class="icon"></i> Add Questão</h3>
+        
+        <!-- --- AQUI: Título do formulário atualizado --- -->
+        <h3><i class="icon"></i> Adicionar Questões</h3>
         
         <label for="q-title">Nome da Questão</label>
         <input type="text" id="q-title" name="q-title" required>
@@ -181,8 +180,6 @@ export function renderNotebooksPage(notebooks, allTags) {
         <label for="s-tempo">Tempo (minutos)</label>
         <input type="number" id="s-tempo" name="s-tempo" min="30" value="120">
         
-        <!-- (Lógica de seleção de cadernos para o simulado virá depois) -->
-        
         <button type="submit" class="btn">Criar Simulado</button>
       </form>
     </div>
@@ -205,8 +202,6 @@ export function renderChart(tagData) {
   const labels = Object.keys(tagData);
   const data = Object.values(tagData);
   
-  // --- ATUALIZAÇÃO DE CORES ---
-  // Usa a paleta de cores pré-definida
   const backgroundColors = labels.map((_, index) => 
     CHART_COLORS[index % CHART_COLORS.length]
   );
@@ -224,36 +219,34 @@ export function renderChart(tagData) {
         borderWidth: 1
       }]
     },
-    // --- ATUALIZAÇÃO DAS OPÇÕES ---
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'bottom', // Move a legenda para baixo
+          // --- AQUI: Desativa a legenda ---
+          display: false,
+          position: 'bottom',
         }
       },
       scales: {
         y: {
           beginAtZero: true,
           grid: {
-            display: false, // Remove as linhas de grade do fundo
+            display: false,
           },
           ticks: {
-            // --- CORREÇÃO DO EIXO Y ---
-            // Força o eixo a usar apenas números inteiros
             precision: 0,
             stepSize: 1 
           }
         },
         x: {
           grid: {
-            display: false, // Remove as linhas de grade do fundo
+            display: false,
           }
         }
       }
     }
-    // --- FIM DA ATUALIZAÇÃO ---
   });
 }
 
@@ -262,15 +255,12 @@ export function renderChart(tagData) {
  * @param {object} notebook - O objeto do caderno (vindo do storage)
  */
 export function showNotebookModal(notebook) {
-  // O código da showNotebookModal permanece o mesmo
   const modal = document.getElementById('notebook-modal');
   const modalTitle = document.getElementById('modal-title');
   const modalBody = document.getElementById('modal-body');
   
-  // 1. Popula o título
   modalTitle.textContent = notebook.title;
   
-  // 2. Popula o corpo com a lista de problemas
   if (notebook.problems.length === 0) {
     modalBody.innerHTML = '<p>Nenhum problema adicionado a este caderno ainda.</p>';
   } else {
@@ -290,7 +280,6 @@ export function showNotebookModal(notebook) {
     `;
   }
   
-  // 3. Mostra o modal
   modal.classList.remove('hidden');
 }
 
@@ -316,7 +305,6 @@ export function hideNotebookModal() {
  * @param {Array} notebooks - A lista de cadernos a ser renderizada.
  */
 export function renderNotebookList(notebooks) {
-  // O código da renderNotebookList permanece o mesmo
   const listElement = document.getElementById('notebook-list');
   if (!listElement) {
     return;
