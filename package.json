@@ -1,18 +1,24 @@
 {
-  "name": "competitivepop",
+  "name": "competitive-pop",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  
+  "homepage": "[https://kaeljane.github.io/CompetitivePOP](https://kaeljane.github.io/CompetitivePOP)",
+
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    
+    "deploy": "npm run build && gh-pages -d dist",
+    
     "preview": "vite preview"
   },
-  "devDependencies": {
-    "vite": "^7.1.7"
-  },
   "dependencies": {
-    "chart.js": "^4.5.1",
-    "slim-select": "^3.1.0"
+    "chart.js": "^4.4.1" 
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1", 
+    "vite": "^5.0.0" 
   }
 }
