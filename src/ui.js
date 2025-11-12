@@ -1,11 +1,26 @@
 import Chart from 'chart.js/auto';
-// (O import do SlimSelect foi removido em passos anteriores, o que está correto)
+
+// --- NOVO: Paleta de Cores Pré-definida ---
+// Uma paleta de cores bonita para o gráfico, em vez de cores aleatórias
+const CHART_COLORS = [
+  'rgba(54, 162, 235, 0.8)', // Blue
+  'rgba(75, 192, 192, 0.8)', // Green
+  'rgba(255, 206, 86, 0.8)', // Yellow
+  'rgba(255, 99, 132, 0.8)', // Red
+  'rgba(153, 102, 255, 0.8)', // Purple
+  'rgba(255, 159, 64, 0.8)',  // Orange
+  'rgba(101, 143, 72, 0.8)',  // Olive
+  'rgba(201, 203, 207, 0.8)', // Grey
+  'rgba(255, 105, 180, 0.8)', // Pink
+  'rgba(0, 206, 209, 0.8)',   // Cyan
+];
 
 /**
  * Renderiza o "esqueleto" principal da aplicação (header, main, aside)
  * @param {HTMLElement} appElement - O elemento <div id="app">
  */
 export function renderAppShell(appElement) {
+  // O código da renderAppShell permanece o mesmo
   appElement.innerHTML = `
     <header class="app-header">
       <div class="logo-container">
@@ -56,7 +71,9 @@ export function renderHomePage(tagData) {
     </div>
     <div class="widget">
       <h3>Análise de Tópicos (Weakness Panel)</h3>
-      <p>Problemas com "Accepted" (dados falsos)</p>
+      
+      <p>Contagem de tags de todos os seus cadernos</p>
+
       <div class="chart-container">
         <canvas id="tags-chart"></canvas>
       </div>
@@ -81,6 +98,7 @@ export function renderHomePage(tagData) {
  * @param {Array} allTags - A lista de todas as tags do Codeforces
  */
 export function renderNotebooksPage(notebooks, allTags) {
+  // O código da renderNotebooksPage permanece o mesmo
   const mainContent = document.getElementById('main-content');
   const sidebarContent = document.getElementById('sidebar-content');
 
@@ -88,16 +106,16 @@ export function renderNotebooksPage(notebooks, allTags) {
   mainContent.innerHTML = `
     <div class="page-header">
       <h2>Meus Cadernos</h2>
-      <input type="search" id="search-notebook" placeholder="Pesquisar caderno ou questão...">
+      
+      <input type="search" id="search-notebook" placeholder="Pesquisar Caderno">
+
     </div>
     <!-- A lista agora começa vazia e será preenchida pela renderNotebookList -->
     <div id="notebook-list" class="notebook-grid"></div>
   `;
   
-  // --- ATUALIZAÇÃO ---
   // 2. Chama a nova função para preencher a lista
   renderNotebookList(notebooks);
-  // --- FIM DA ATUALIZAÇÃO ---
 
 
   // 3. Renderiza a Sidebar (Formulários)
@@ -177,42 +195,65 @@ export function renderNotebooksPage(notebooks, allTags) {
  */
 export function renderChart(tagData) {
   const ctx = document.getElementById('tags-chart');
-  if (!ctx) return; // Sai se o canvas não estiver na página
+  if (!ctx) return; 
 
-  // Destrói gráfico antigo, se houver, para evitar bugs
   const existingChart = Chart.getChart(ctx);
   if (existingChart) {
     existingChart.destroy();
   }
 
-  // Gera cores aleatórias para o gráfico
   const labels = Object.keys(tagData);
   const data = Object.values(tagData);
-  const backgroundColors = labels.map(() => 
-    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`
+  
+  // --- ATUALIZAÇÃO DE CORES ---
+  // Usa a paleta de cores pré-definida
+  const backgroundColors = labels.map((_, index) => 
+    CHART_COLORS[index % CHART_COLORS.length]
   );
+  const borderColors = backgroundColors.map(color => color.replace('0.8', '1'));
 
   new Chart(ctx, {
-    type: 'bar', // Tipo de gráfico
+    type: 'bar',
     data: {
       labels: labels,
       datasets: [{
         label: '# de Problemas Resolvidos',
         data: data,
         backgroundColor: backgroundColors,
-        borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+        borderColor: borderColors,
         borderWidth: 1
       }]
     },
+    // --- ATUALIZAÇÃO DAS OPÇÕES ---
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom', // Move a legenda para baixo
+        }
+      },
       scales: {
         y: {
-          beginAtZero: true
+          beginAtZero: true,
+          grid: {
+            display: false, // Remove as linhas de grade do fundo
+          },
+          ticks: {
+            // --- CORREÇÃO DO EIXO Y ---
+            // Força o eixo a usar apenas números inteiros
+            precision: 0,
+            stepSize: 1 
+          }
+        },
+        x: {
+          grid: {
+            display: false, // Remove as linhas de grade do fundo
+          }
         }
       }
     }
+    // --- FIM DA ATUALIZAÇÃO ---
   });
 }
 
@@ -221,6 +262,7 @@ export function renderChart(tagData) {
  * @param {object} notebook - O objeto do caderno (vindo do storage)
  */
 export function showNotebookModal(notebook) {
+  // O código da showNotebookModal permanece o mesmo
   const modal = document.getElementById('notebook-modal');
   const modalTitle = document.getElementById('modal-title');
   const modalBody = document.getElementById('modal-body');
@@ -257,11 +299,10 @@ export function showNotebookModal(notebook) {
  */
 export function hideNotebookModal() {
   const modal = document.getElementById('notebook-modal');
-  if (!modal) return; // Proteção
+  if (!modal) return; 
   
   modal.classList.add('hidden');
   
-  // Limpa o conteúdo para a próxima vez
   const modalTitle = document.getElementById('modal-title');
   const modalBody = document.getElementById('modal-body');
   
@@ -270,15 +311,14 @@ export function hideNotebookModal() {
 }
 
 
-// --- NOVA FUNÇÃO ---
 /**
  * Renderiza a lista de cards de caderno dentro do elemento #notebook-list.
  * @param {Array} notebooks - A lista de cadernos a ser renderizada.
  */
 export function renderNotebookList(notebooks) {
+  // O código da renderNotebookList permanece o mesmo
   const listElement = document.getElementById('notebook-list');
   if (!listElement) {
-    // Não é um erro, pode estar na 'home' page
     return;
   }
 
@@ -295,4 +335,3 @@ export function renderNotebookList(notebooks) {
     </div>
   `).join('');
 }
-// --- FIM DA NOVA FUNÇÃO ---
