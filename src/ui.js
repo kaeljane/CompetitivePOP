@@ -1,30 +1,24 @@
 import Chart from 'chart.js/auto';
 import { getStorage } from './storage.js';
 
-// Paleta de cores para o gráfico
 const CHART_COLORS = [
-  '#36A2EB', // Azul
-  '#4BC0C0', // Verde-água
-  '#FFCE56', // Amarelo
-  '#E7608A', // Rosa
-  '#9966FF', // Roxo
-  '#FF9F40', // Laranja
-  '#4CAF50', // Verde
+  '#36A2EB', 
+  '#4BC0C0', 
+  '#FFCE56', 
+  '#E7608A', 
+  '#9966FF', 
+  '#FF9F40', 
+  '#4CAF50', 
 ];
 
-let chartInstance = null; // Variável global para guardar a instância do gráfico
+let chartInstance = null; 
 
-/**
- * Renderiza o gráfico de tags.
- * @param {object} tagCounts - Objeto com tags como chaves e contagens como valores
- */
 export function renderChart(tagCounts) {
   const canvas = document.getElementById('tagsChart');
-  if (!canvas) return; // Sai se o canvas não estiver na página
+  if (!canvas) return; 
 
   const ctx = canvas.getContext('2d');
   
-  // Destrói o gráfico anterior (se existir) para evitar sobreposição
   if (chartInstance) {
     chartInstance.destroy();
   }
@@ -32,7 +26,6 @@ export function renderChart(tagCounts) {
   const labels = Object.keys(tagCounts);
   const data = Object.values(tagCounts);
   
-  // Mapeia os dados para a paleta de cores
   const backgroundColors = labels.map((_, index) => 
     CHART_COLORS[index % CHART_COLORS.length]
   );
@@ -53,7 +46,7 @@ export function renderChart(tagCounts) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false, // Remove a legenda (quadrado azul)
+          display: false, 
           position: 'bottom',
         },
         title: {
@@ -64,17 +57,16 @@ export function renderChart(tagCounts) {
         y: {
           beginAtZero: true,
           grid: {
-            display: false, // Remove linhas de grade (fundo)
+            display: false, 
           },
           ticks: {
-            // Força o eixo Y a usar apenas números inteiros
             stepSize: 1, 
             precision: 0
           }
         },
         x: {
           grid: {
-            display: false, // Remove linhas de grade (fundo)
+            display: false, 
           }
         }
       }
@@ -82,15 +74,10 @@ export function renderChart(tagCounts) {
   });
 }
 
-/**
- * Renderiza o conteúdo principal da página "Home" (Dashboard).
- * @param {object} quickStats - Objeto com as estatísticas rápidas
- */
 export function renderHomePage(quickStats) {
   const app = document.getElementById('app');
   if (!app) return;
 
-  // O <h2> foi removido daqui e será controlado pelo main.js
   const mainContent = `
     <div class="widget">
       <h3>Análise de Tópicos (Weakness Panel)</h3>
@@ -101,7 +88,6 @@ export function renderHomePage(quickStats) {
     </div>
   `;
   
-  // Conteúdo da Sidebar para a Home
   const sidebarContent = `
     <div class="widget quick-stats">
       <h3>Estatísticas Rápidas</h3>
@@ -123,7 +109,6 @@ export function renderHomePage(quickStats) {
     </div>
   `;
 
-  // Seleciona os containers de conteúdo
   const mainContainer = app.querySelector('main');
   const asideContainer = app.querySelector('aside');
 
@@ -133,16 +118,10 @@ export function renderHomePage(quickStats) {
   }
 }
 
-/**
- * Renderiza a lista de cards de caderno.
- * Esta função é separada para permitir a re-renderização (ex: pesquisa).
- * @param {Array} notebooks - A lista de cadernos a ser renderizada
- */
 export function renderNotebookList(notebooks) {
   const grid = document.getElementById('notebook-list');
   if (!grid) return;
 
-  // Limpa a grade antes de renderizar
   grid.innerHTML = ''; 
   
   if (notebooks.length === 0) {
@@ -161,33 +140,24 @@ export function renderNotebookList(notebooks) {
   });
 }
 
-/**
- * Renderiza o conteúdo principal da página "Cadernos".
- * @param {Array} notebooks - A lista de todos os cadernos
- * @param {Array} allTags - A lista de todas as tags do Codeforces
- */
 export function renderNotebooksPage(notebooks, allTags) {
   const app = document.getElementById('app');
   if (!app) return;
 
-  // O <h2> e o <input> de pesquisa foram removidos daqui
   const mainContent = `
     <div class="notebook-grid" id="notebook-list">
       <!-- Os cards de caderno serão injetados aqui -->
     </div>
   `;
   
-  // Gera as <option> para o <select> de tags
   const tagsOptions = allTags.map(tag => 
     `<option value="${tag}">${tag}</option>`
   ).join('');
   
-  // Gera as <option> para o <select> de cadernos
   const notebookOptions = notebooks.map(nb => 
     `<option value="${nb.id}">${nb.title}</option>`
   ).join('');
 
-  // Conteúdo da Sidebar para a página "Cadernos"
   const sidebarContent = `
     <div class="widget">
       <h3>Adicionar Questões</h3>
@@ -237,7 +207,6 @@ export function renderNotebooksPage(notebooks, allTags) {
     </div>
   `;
 
-  // Seleciona os containers de conteúdo
   const mainContainer = app.querySelector('main');
   const asideContainer = app.querySelector('aside');
 
@@ -246,14 +215,9 @@ export function renderNotebooksPage(notebooks, allTags) {
     asideContainer.innerHTML = sidebarContent;
   }
   
-  // IMPORTANTE: Após o HTML ser injetado, renderiza a lista
   renderNotebookList(notebooks);
 }
 
-/**
- * Renderiza o "esqueleto" principal do app (Header, Main, Aside).
- * Isso é chamado apenas uma vez no início.
- */
 export function renderAppShell() {
   const appRoot = document.getElementById('app');
   if (!appRoot) return;
@@ -305,10 +269,6 @@ export function renderAppShell() {
   `;
 }
 
-/**
- * Mostra o modal com os detalhes de um caderno.
- * @param {object} notebook - O objeto do caderno
- */
 export function showNotebookModal(notebook) {
   const modal = document.getElementById('notebook-modal');
   const title = document.getElementById('modal-title');
@@ -316,15 +276,13 @@ export function showNotebookModal(notebook) {
   
   if (!modal || !title || !list) return;
 
-  // Preenche os dados do modal
   title.textContent = notebook.title;
-  list.innerHTML = ''; // Limpa a lista anterior
+  list.innerHTML = ''; 
 
   if (notebook.problems.length === 0) {
     list.innerHTML = '<li>Nenhum problema adicionado a este caderno.</li>';
   } else {
     notebook.problems.forEach(problem => {
-      // Gera os "chips" de tags
       const tagsHtml = problem.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
       
       list.innerHTML += `
@@ -338,13 +296,9 @@ export function showNotebookModal(notebook) {
     });
   }
 
-  // Mostra o modal
   modal.classList.remove('hidden');
 }
 
-/**
- * Esconde o modal.
- */
 export function hideNotebookModal() {
   const modal = document.getElementById('notebook-modal');
   if (modal) {

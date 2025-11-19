@@ -12,18 +12,13 @@ import {
 } from './ui.js';
 import { CODEFORCES_TAGS } from './api.js';
 
-let navigateTo = () => {}; // Função placeholder
+let navigateTo = () => {}; 
 
-/**
- * Lida com todos os envios de formulário (submit) na página.
- * @param {Event} event 
- */
 function handleSubmit(event) {
   event.preventDefault(); 
   const formId = event.target.id;
   const data = getStorage();
 
-  // --- Lógica para Criar Novo Caderno ---
   if (formId === 'new-notebook-form') {
     const titleInput = document.getElementById('nb-title');
     const descInput = document.getElementById('nb-desc');
@@ -42,7 +37,6 @@ function handleSubmit(event) {
     }
   }
 
-  // --- Lógica para Adicionar Nova Questão ---
   if (formId === 'new-problem-form') {
     const title = document.getElementById('q-title').value;
     const url = document.getElementById('q-link').value;
@@ -73,10 +67,6 @@ function handleSubmit(event) {
   }
 }
 
-/**
- * Lida com todos os cliques (click) na página.
- * @param {Event} event 
- */
 function handleClick(event) {
   const target = event.target; 
 
@@ -111,49 +101,33 @@ function handleClick(event) {
   }
 }
 
-/**
- * Lida com todos os eventos de 'input' (digitação) na página.
- * @param {Event} event 
- */
 function handleInput(event) {
-  // Filtra para rodar apenas no input de pesquisa
   if (event.target.id === 'search-notebook') {
-    // --- DEBUG 1 ---
     console.log('Evento "input" disparado pela barra de pesquisa!');
     
     const searchTerm = event.target.value.toLowerCase();
-    const { notebooks } = getStorage(); // Pega todos os cadernos
+    const { notebooks } = getStorage(); 
     
-    // --- DEBUG 2 ---
     console.log('Termo da pesquisa:', searchTerm);
 
-    // Filtra os cadernos
     const filteredNotebooks = notebooks.filter(nb => {
       const titleMatch = nb.title.toLowerCase().includes(searchTerm);
       const descMatch = (nb.description || '').toLowerCase().includes(searchTerm);
       return titleMatch || descMatch;
     });
     
-    // --- DEBUG 3 ---
     console.log('Cadernos filtrados:', filteredNotebooks);
 
-    // Re-renderiza APENAS a lista de cards
     renderNotebookList(filteredNotebooks);
   }
 }
 
-
-/**
- * Registra os 'escutadores' de eventos principais.
- * @param {Function} navigateToCallback - A função 'navigateTo' do main.js
- */
 export function registerEventListeners(navigateToCallback) {
   navigateTo = navigateToCallback; 
 
   document.addEventListener('submit', handleSubmit);
   document.addEventListener('click', handleClick);
   
-  // --- DEBUG 4 ---
   console.log('Registrando escutador de evento "input"...');
   document.addEventListener('input', handleInput);
 }
