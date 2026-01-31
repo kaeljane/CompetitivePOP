@@ -1,24 +1,29 @@
 {
   "name": "competitive-pop",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  
-  "homepage": "[https://kaeljane.github.io/CompetitivePOP](https://kaeljane.github.io/CompetitivePOP)",
-
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    
-    "deploy": "npm run build && gh-pages -d dist",
-    
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
   "dependencies": {
-    "chart.js": "^4.4.1" 
+    "@supabase/supabase-js": "^2.93.3",
+    "chart.js": "^4.5.1",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1", 
-    "vite": "^5.0.0" 
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
