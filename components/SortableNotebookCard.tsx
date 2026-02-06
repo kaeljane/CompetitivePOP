@@ -4,10 +4,101 @@ import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { supabase } from '../lib/supabaseClient'; 
-import { GripVertical, Pencil, Trash2, Check, X, AlertTriangle } from 'lucide-react';
+import { GripVertical, Pencil, Trash2, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast'; 
 
+// --- NOVO COMPONENTE DO TOAST (Para gerenciar a animação) ---
+const DeleteConfirmationToast = ({ t, onConfirm }: { t: any, onConfirm: () => void }) => {
+  const [isExiting, setIsExiting] = useState(false);
+
+  const handleCancel = () => {
+    // 1. Ativa a animação de saída
+    setIsExiting(true);
+    // 2. Espera a animação terminar (300ms) antes de remover do DOM
+    setTimeout(() => {
+      toast.dismiss(t.id);
+    }, 300);
+  };
+
+  return (
+    <div className={`delete-toast-card ${isExiting ? 'animate-out' : 'animate-in'}`}>
+      {/* Estilos CSS Inline para garantir o funcionamento nesse componente isolado */}
+      <style jsx>{`
+        .delete-toast-card {
+          background: #ffffff;
+          padding: 16px 20px;
+          border-radius: 12px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+          border: 1px solid #f0f0f0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          min-width: 260px;
+          transform-origin: center;
+        }
+
+        /* Animação de Entrada (Suave) */
+        .animate-in {
+          animation: enterAnimation 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Animação de Saída (Sobe para cima e desaparece) */
+        .animate-out {
+          animation: exitAnimation 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes enterAnimation {
+          from { opacity: 0; transform: translateY(10px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes exitAnimation {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(-20px); } /* Sobe 20px */
+        }
+
+        .toast-text { font-size: 0.95rem; color: #444; text-align: center; font-weight: 500; }
+        
+        .toast-actions { display: flex; gap: 10px; justify-content: center; width: 100%; }
+        
+        .btn-cancel {
+          background: #f5f5f5; color: #333; border: 1px solid #e0e0e0;
+          padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;
+          transition: all 0.2s;
+        }
+        .btn-cancel:hover { background: #eeeeee; }
+
+        .btn-confirm {
+          background: #ff4d4d; color: white; border: none;
+          padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;
+          box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
+          transition: all 0.2s;
+        }
+        .btn-confirm:hover { background: #ff3333; transform: translateY(-1px); }
+      `}</style>
+
+      <span className="toast-text">Todas as questões serão perdidas.</span>
+      <div className="toast-actions">
+        <button onClick={handleCancel} className="btn-cancel">
+          Cancelar
+        </button>
+        <button 
+          onClick={() => {
+            toast.dismiss(t.id);
+            onConfirm();
+          }} 
+          className="btn-confirm"
+        >
+          Apagar
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// --- SEU COMPONENTE PRINCIPAL ---
 export function SortableNotebookCard({ notebook, onClick }: any) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -22,33 +113,40 @@ export function SortableNotebookCard({ notebook, onClick }: any) {
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 999 : 1,
     position: 'relative' as 'relative',
-    // ❌ REMOVI O 'touchAction: none' DAQUI!
-    // Agora o navegador sabe que pode dar scroll se tocar no cartão.
   };
 
-  // --- 1. MODAL PREMIUM (Igual ao anterior) ---
+  // --- LÓGICA DE APAGAR ---
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Chama o Toast Customizado passando a lógica de confirmação
     toast.custom((t) => (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', minWidth: '220px', padding: '8px 4px' }}>
-        <span style={{ fontSize: '0.95rem', color: '#444', textAlign: 'center' }}>Todas as questões serão perdidas.</span>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%' }}>
-          <button onClick={() => toast.dismiss(t.id)} style={{ background: '#f0f0f0', color: '#333', border: '1px solid #ddd', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 500 }}>Cancelar</button>
-          <button onClick={async () => {
-              toast.dismiss(t.id);
-              const loadingToast = toast.loading('Apagando...');
-              const { error } = await supabase.from('notebooks').delete().eq('id', notebook.id);
-              toast.dismiss(loadingToast);
-              if (error) toast.error('Erro: ' + error.message);
-              else { toast.success('Caderno apagado!'); window.location.reload(); }
-            }}
-            style={{ background: '#ff4d4d', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 4px rgba(255, 77, 77, 0.2)' }}>Apagar</button>
-        </div>
-      </div>
-    ), { duration: 5000, position: 'top-center', style: { background: '#fff', padding: '16px', borderRadius: '12px', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', border: '1px solid #f0f0f0' } });
+      <DeleteConfirmationToast 
+        t={t} 
+        onConfirm={async () => {
+          const loadingToast = toast.loading('Apagando...');
+          const { error } = await supabase.from('notebooks').delete().eq('id', notebook.id);
+          toast.dismiss(loadingToast);
+          
+          if (error) {
+            toast.error('Erro: ' + error.message);
+          } else {
+            toast.success('Caderno apagado!');
+            // Idealmente use router.refresh() ou invalide o cache ao invés de reload total, 
+            // mas mantive reload conforme seu código original
+            window.location.reload(); 
+          }
+        }} 
+      />
+    ), { 
+      duration: 5000, 
+      position: 'top-center',
+      // Removemos o estilo padrão daqui para controlar tudo dentro do componente DeleteConfirmationToast
+      style: { background: 'transparent', boxShadow: 'none' } 
+    });
   };
 
-  // --- 2. SALVAR EDIÇÃO ---
+  // --- LÓGICA DE SALVAR ---
   const handleSave = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const savePromise = async () => {
@@ -62,7 +160,7 @@ export function SortableNotebookCard({ notebook, onClick }: any) {
     });
   };
 
-  const handleCancel = (e: React.MouseEvent) => {
+  const handleCancelEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setTitle(notebook.title);
     setDesc(notebook.description);
@@ -72,18 +170,17 @@ export function SortableNotebookCard({ notebook, onClick }: any) {
   return (
     <>
       <style jsx>{`
-        /* ... (Seus estilos anteriores continuam iguais) ... */
         .notebook-card-polished { display: flex; align-items: stretch; background: #ffffff; border: 1px solid #e1e4e8; border-radius: 12px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s ease; }
         .notebook-card-polished:hover { border-color: #0070f3; box-shadow: 0 4px 12px rgba(0,112,243,0.15); transform: translateY(-2px); }
         
         .drag-handle-zone { 
           padding: 0 12px; display: flex; align-items: center; cursor: grab; 
           color: #999; background: #f8f9fa; border-right: 1px solid #eee; transition: background 0.2s;
-          touch-action: none; /* ✅ AQUI SIM! Bloqueia o scroll SÓ na alça para permitir arrastar */
+          touch-action: none; 
         }
         
         .drag-handle-zone:hover { background: #f0f0f0; color: #555; }
-        .content-zone { flex: 1; padding: 16px; cursor: pointer; } /* Onde clica para entrar */
+        .content-zone { flex: 1; padding: 16px; cursor: pointer; } 
         h4 { margin: 0 0 6px 0; color: #111; font-weight: 600; }
         p { margin: 0; color: #666; font-size: 0.9rem; }
         .meta-info { display: flex; gap: 12px; margin-top: 12px; font-size: 0.8rem; color: #888; }
@@ -98,7 +195,6 @@ export function SortableNotebookCard({ notebook, onClick }: any) {
       `}</style>
 
       <div ref={setNodeRef} style={style} className="notebook-card-polished">
-        {/* Adicionei touchAction: 'none' aqui na div da alça também para garantir */}
         <div 
           className="drag-handle-zone" 
           {...attributes} 
@@ -130,7 +226,7 @@ export function SortableNotebookCard({ notebook, onClick }: any) {
         </div>
         <div className="actions-zone">
           {isEditing ? (
-            <> <button onClick={handleSave} className="icon-button success"><Check size={18}/></button> <button onClick={handleCancel} className="icon-button danger"><X size={18}/></button> </>
+            <> <button onClick={handleSave} className="icon-button success"><Check size={18}/></button> <button onClick={handleCancelEdit} className="icon-button danger"><X size={18}/></button> </>
           ) : (
             <> <button onClick={(e) => { e.stopPropagation(); setIsEditing(true); }} className="icon-button"><Pencil size={18}/></button> <button onClick={handleDelete} className="icon-button danger"><Trash2 size={18}/></button> </>
           )}
