@@ -30,8 +30,13 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
   }, [notebooks]);
 
   // Sensores para detectar mouse e toque (celular)
+  // Sensores ATUALIZADOS (Com correção para o clique funcionar)
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // A MÁGICA: Só arrasta se mover 8 pixels. Se não mover, conta como clique.
+      },
+    }),
     useSensor(KeyboardSensor)
   );
 
