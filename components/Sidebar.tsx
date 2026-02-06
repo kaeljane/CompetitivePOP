@@ -58,7 +58,6 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
   // Note que aqui retornamos <aside> porque seu CSS estiliza a tag 'aside' diretamente
   return (
     <aside>
-      
       {/* Widget Adicionar Questão */}
       <div className="widget">
         <h3>Adicionar Questão</h3>
@@ -107,7 +106,7 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
           </button>
         </form>
       </div>
-
+      
     </aside>
   );
 }
