@@ -24,8 +24,11 @@ export default async function NotebooksPage() {
   const { data: notebooks } = await supabase
     .from('notebooks')
     .select('*, problems(*)')
-    .order('position', { ascending: true }); 
-
+    .order('position', { ascending: true })
+    
+    // Isso ordena as QUESTÕES (problems) dentro de cada caderno
+    // 'ascending: true' significa: Mais antigas no topo, Novas no final (fundo).
+    .order('created_at', { foreignTable: 'problems', ascending: true });
   return (
     <NotebookList 
       notebooks={notebooks || []} 
