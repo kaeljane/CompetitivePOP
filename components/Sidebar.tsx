@@ -30,22 +30,15 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
     const url = formData.get('q-link') as string;
     const notebookId = formData.get('q-notebook') as string;
     
-    // --- NOVO: REQUISITO DE REGEXP ---
-    // Essa "fórmula mágica" verifica se o texto parece um link real
-    const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    // --- MUDANÇA: REGEX REMOVIDO ---
+    // Agora confiamos apenas no input type="url" do HTML
+    // e permitimos salvar o link direto no banco.
     
-    if (!urlRegex.test(url)) {
-      alert("A URL informada é inválida! Verifique se começa com http:// ou https://");
-      setLoading(false);
-      return; // Para tudo e não deixa salvar
-    }
-    // ----------------------------------
-
     // Pega as tags selecionadas (multi-select)
     const select = e.currentTarget.querySelector('#q-tags') as HTMLSelectElement;
     const selectedTags = Array.from(select.selectedOptions).map(opt => opt.value);
 
-    // ... (o resto do código continua igual: chama o supabase, insert, etc.)
+    // Salva no Supabase
     const { error } = await supabase
       .from('problems')
       .insert([{ title, url, notebook_id: notebookId, tags: selectedTags }]);
@@ -55,7 +48,6 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
     setLoading(false);
   }
 
-  // Note que aqui retornamos <aside> porque seu CSS estiliza a tag 'aside' diretamente
   return (
     <aside>
       {/* Widget Adicionar Questão */}
@@ -64,7 +56,7 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
         <form onSubmit={handleAddProblem}>
           <div className="form-group">
             <label>Nome da Questão</label>
-            <input type="text" name="q-title" required /> {/* CSS pega input[type="text"] */}
+            <input type="text" name="q-title" required />
           </div>
           <div className="form-group">
             <label>Link</label>
