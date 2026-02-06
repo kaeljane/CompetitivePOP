@@ -42,7 +42,7 @@ export default async function Home() {
           </div>
         </main>
 
-        {/* Sidebar: ESTATÍSTICAS RÁPIDAS (Voltamos ao original aqui) */}
+        {/* Sidebar: ESTATÍSTICAS RÁPIDAS */}
         <aside>
           <div className="widget quick-stats">
             <h3>Estatísticas Rápidas</h3>

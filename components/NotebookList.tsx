@@ -24,7 +24,7 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     );
   });
 
-  // --- FUNÇÃO 1: DELETAR (Já existia) ---
+  // --- FUNÇÃO 1: DELETAR ---
   async function handleDeleteProblem(problemId: string) {
     if (!confirm("Tem certeza que deseja excluir esta questão?")) return;
 

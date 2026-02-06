@@ -5,7 +5,7 @@ export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 const CODEFORCES_TAGS = [
-  "implementation", "math", "greedy", "dp", "data structures",
+  "None", "implementation", "math", "greedy", "dp", "data structures",
   "brute force", "constructive algorithms", "graphs", "sortings",
   "binary search", "dfs and similar", "trees", "strings",
   "number theory", "combinatorics", "geometry", "bitmasks",
@@ -18,13 +18,11 @@ const CODEFORCES_TAGS = [
 ];
 
 export default async function NotebooksPage() {
-  // Busca cadernos E suas questões
   const { data: notebooks } = await supabase
     .from('notebooks')
     .select('*, problems(*)')
     .order('created_at', { ascending: false });
 
-  // Renderiza o componente "inteligente" que tem a pesquisa
   return (
     <NotebookList 
       notebooks={notebooks || []} 

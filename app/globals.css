@@ -44,7 +44,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* --- ESPAÇAMENTO CORRIGIDO --- */
   padding: 1rem 1.5rem; 
   background-color: var(--color-widget-bg);
   border-bottom: 1px solid var(--color-border);
@@ -137,7 +136,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 400px; 
   gap: 1.5rem;
-  /* --- ESPAÇAMENTO CORRIGIDO --- */
   padding: 1.5rem 1.5rem; 
   
   flex: 1; 
@@ -481,7 +479,6 @@ select[multiple] option:checked {
 
 /* --- 7. Responsividade (Telas Pequenas) --- */
 
-/* Este 'breakpoint' (900px) é onde o layout de 2 colunas quebra */
 @media (max-width: 900px) {
 
   /* 1. Layout: Mudar de 2 colunas para 1 coluna */
