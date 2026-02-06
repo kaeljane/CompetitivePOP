@@ -18,10 +18,13 @@ const CODEFORCES_TAGS = [
 ];
 
 export default async function NotebooksPage() {
+  // --- MUDANÇA IMPORTANTE AQUI ---
+  // Trocamos .order('created_at', ...) por .order('position', { ascending: true })
+  // Isso garante que o site obedeça a ordem que você salvou ao arrastar.
   const { data: notebooks } = await supabase
     .from('notebooks')
     .select('*, problems(*)')
-    .order('created_at', { ascending: false });
+    .order('position', { ascending: true }); 
 
   return (
     <NotebookList 
