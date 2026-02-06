@@ -1,4 +1,5 @@
-import { supabase } from "../../lib/supabaseClient";
+// 1. Mudamos a importação para o novo arquivo que sabe ler cookies
+import { createClient } from "../../lib/supabaseServer"; 
 import NotebookList from "../../components/NotebookList";
 
 export const revalidate = 0;
@@ -18,17 +19,16 @@ const CODEFORCES_TAGS = [
 ];
 
 export default async function NotebooksPage() {
-  // --- MUDANÇA IMPORTANTE AQUI ---
-  // Trocamos .order('created_at', ...) por .order('position', { ascending: true })
-  // Isso garante que o site obedeça a ordem que você salvou ao arrastar.
+  // 2. Inicializamos o cliente autenticado
+  const supabase = await createClient();
+
+  // O resto da lógica continua igual, mas agora o banco sabe que é VOCÊ!
   const { data: notebooks } = await supabase
     .from('notebooks')
     .select('*, problems(*)')
     .order('position', { ascending: true })
-    
-    // Isso ordena as QUESTÕES (problems) dentro de cada caderno
-    // 'ascending: true' significa: Mais antigas no topo, Novas no final (fundo).
     .order('created_at', { foreignTable: 'problems', ascending: true });
+
   return (
     <NotebookList 
       notebooks={notebooks || []} 
