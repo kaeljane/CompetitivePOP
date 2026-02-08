@@ -60,7 +60,7 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
           </div>
           <div className="form-group">
             <label>Link</label>
-            <input type="url" name="q-link" required />
+            <input type="url" name="q-link" placeholder="Link (Opcional)" />
           </div>
           <div className="form-group">
             <label>Tags (Ctrl+Click)</label>
