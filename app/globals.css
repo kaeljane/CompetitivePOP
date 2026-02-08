@@ -9,8 +9,8 @@
   --color-primary-dark: #0056b3;
   --color-text: #212529;
   --color-text-muted: #6c757d;
-  --color-background: #f4f7f6; /* Fundo principal (cinza bem claro) */
-  --color-widget-bg: #ffffff; /* Fundo dos cards/widgets (branco) */
+  --color-background: #f4f7f6;
+  --color-widget-bg: #ffffff;
   --color-border: #dee2e6;
   --color-success: #28a745;
   --color-danger: #dc3545;
@@ -25,6 +25,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* --- AQUI ESTÁ A CORREÇÃO DO TRAÇO --- */
+/* Isso garante que NENHUM link no site tenha sublinhado por padrão */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
 }
 
 body {
@@ -51,11 +59,9 @@ body {
   top: 0;
   z-index: 100;
   height: 65px; 
-  
-  /* Centraliza o conteúdo do header */
   width: 100%;
   max-width: 1300px; 
-  margin: 0 auto; /* Centraliza o header */
+  margin: 0 auto;
 }
 
 .logo-container {
@@ -77,6 +83,7 @@ body {
   color: var(--color-text);
 }
 
+/* Botões da Navegação (Estilo Base Global) */
 .nav-button {
   font-size: 1rem;
   font-weight: 500;
@@ -87,6 +94,11 @@ body {
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s ease;
+  
+  /* Flexbox para alinhar ícones se houver */
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .nav-button:hover {
@@ -99,16 +111,12 @@ body {
   color: #ffffff;
 }
 
-/* --- 3. Layout Principal (Container) --- */
-
-/* --- CORREÇÃO DO SELETOR (ID) E ESPAÇAMENTO --- */
+/* --- 3. Layout Principal --- */
 #page-header-container {
-  padding: 0 1.5rem; /* Espaçamento lateral */
-  
+  padding: 0 1.5rem; 
   max-width: 1300px; 
   width: 100%;
-  margin: 0 auto; /* Centraliza */
-  
+  margin: 0 auto; 
   position: sticky;
   top: 65px; 
   background-color: var(--color-background);
@@ -137,11 +145,10 @@ body {
   grid-template-columns: 1fr 400px; 
   gap: 1.5rem;
   padding: 1.5rem 1.5rem; 
-  
   flex: 1; 
   max-width: 1300px; 
   width: 100%;
-  margin: 0 auto; /* Centraliza */
+  margin: 0 auto; 
 }
 
 main {
@@ -161,9 +168,7 @@ aside {
   align-self: start; 
 }
 
-
-/* --- 4. Componentes (Widgets, Cards, Formulários) --- */
-
+/* --- 4. Componentes --- */
 .widget {
   background-color: var(--color-widget-bg);
   border: 1px solid var(--color-border);
@@ -177,7 +182,7 @@ aside {
   margin-bottom: 1rem;
 }
 
-/* Estilos para "Estatísticas Rápidas" */
+/* Stats */
 .quick-stats .stat-item {
   display: flex;
   flex-direction: column; 
@@ -204,8 +209,7 @@ aside {
   color: var(--color-text-muted);
 }
 
-
-/* Barra de Pesquisa */
+/* Pesquisa */
 #search-notebook {
   padding: 0.75rem 1rem 0.75rem 2.5rem; 
   border: 1px solid var(--color-border);
@@ -214,7 +218,6 @@ aside {
   width: 100%;
   max-width: 350px;
   transition: border-color 0.2s, box-shadow 0.2s;
-  
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 1rem center;
@@ -226,7 +229,7 @@ aside {
   box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
 }
 
-/* Grid de Cadernos */
+/* Cards */
 .notebook-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -269,7 +272,7 @@ aside {
   color: var(--color-text);
 }
 
-/* Formulários da Sidebar */
+/* Forms */
 form {
   display: flex;
   flex-direction: column;
@@ -302,7 +305,6 @@ form select:focus {
   box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
 }
 
-/* Seletor Múltiplo de Tags */
 select[multiple] {
   padding: 0.5rem;
   height: 120px; 
@@ -350,7 +352,7 @@ select[multiple] option:checked {
   filter: brightness(1); 
 }
 
-/* --- 5. Modal (Janela Flutuante) --- */
+/* --- 5. Modal --- */
 .modal-backdrop {
   position: fixed;
   inset: 0; 
@@ -412,7 +414,7 @@ select[multiple] option:checked {
   color: var(--color-danger);
 }
 
-/* Lista de Problemas (dentro do Modal) */
+/* Lista Modal */
 .problem-list {
   list-style: none;
   display: flex;
@@ -466,8 +468,7 @@ select[multiple] option:checked {
   white-space: nowrap; 
 }
 
-/* --- 6. Gráfico (Dashboard) --- */
-
+/* --- 6. Charts --- */
 .chart-container {
   position: relative;
   width: 100%;
@@ -476,33 +477,27 @@ select[multiple] option:checked {
   margin: 1.5rem auto 0 auto; 
 }
 
-
-/* --- 7. Responsividade (Telas Pequenas) --- */
-
+/* --- 7. Mobile --- */
 @media (max-width: 900px) {
-
-  /* 1. Layout: Mudar de 2 colunas para 1 coluna */
   .container {
-    grid-template-columns: 1fr; /* Força 1 coluna */
+    grid-template-columns: 1fr; 
     padding-left: 1rem;
     padding-right: 1rem;
   }
   
-  /* 2. Sidebar: Tira o 'sticky' e 'height' */
   aside {
-    position: static; /* Remove o 'sticky' */
-    height: auto; /* Deixa a altura ser automática */
-    overflow-y: visible; /* Remove o scroll interno */
+    position: static; 
+    height: auto; 
+    overflow-y: visible; 
     top: auto;
   }
   
-  /* 3. Cabeçalho: Empilha o logo e os links */
   .app-header {
-    flex-direction: column; /* Empilha o logo e os links de navegação */
-    height: auto; /* Altura automática */
+    flex-direction: column; 
+    height: auto; 
     gap: 0.5rem;
     padding: 1rem;
-    max-width: 100%; /* Ocupa 100% no celular */
+    max-width: 100%;
   }
   
   .nav-links {
@@ -514,39 +509,37 @@ select[multiple] option:checked {
   }
   
   .nav-button {
-    flex: 1; /* Faz os botões ocuparem espaço igual */
+    flex: 1; 
     text-align: center;
+    justify-content: center; /* Centraliza no mobile */
   }
 
-  /* 4. Cabeçalho da Página: Empilha o título e a pesquisa */
   #page-header-container {
-    position: static; /* Deixa de ser 'sticky' no celular */
+    position: static; 
     max-width: 100%;
     padding: 0 1rem;
   }
   
   .page-header {
-    flex-direction: column; /* Empilha o título e a barra */
-    align-items: flex-start; /* Alinha tudo à esquerda */
+    flex-direction: column; 
+    align-items: flex-start; 
     gap: 1rem;
     padding: 1rem 0;
     min-height: auto;
   }
   
   .page-header h2 {
-    font-size: 1.5rem; /* Título menor no celular */
+    font-size: 1.5rem; 
   }
   
   #search-notebook {
-    max-width: 100%; /* Barra de pesquisa ocupa 100% */
+    max-width: 100%; 
   }
   
-  /* 5. Gráfico: Reduz a altura no celular */
   .chart-container {
     height: 300px;
   }
   
-  /* 6. Modal: Ocupa a tela inteira */
   .modal-content {
     max-width: 95%;
     max-height: 90vh;
