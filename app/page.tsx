@@ -35,7 +35,7 @@ export default async function Home() {
         {/* Área Principal: GRÁFICO */}
         <main>
            <div className="widget">
-             <h3>Análise de Tópicos (Weakness Panel)</h3>
+             <h3>Análise de Tópicos</h3>
              <p style={{marginBottom: '1rem', color: '#666'}}>Contagem de tags de todos os seus cadernos</p>
              <div className="chart-container">
                <TopicChart problems={problems || []} />
