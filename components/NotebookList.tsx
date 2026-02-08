@@ -5,12 +5,11 @@ import Sidebar from './Sidebar';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { SortableNotebookCard } from './SortableNotebookCard';
-import { GripVertical, Search } from 'lucide-react';
-import FeynmanModal from './FeynmanModal'; // <--- IMPORTAÇÃO NOVA
+import { Search, CheckCircle2 } from 'lucide-react'; // Adicionei ícone de Check
+import FeynmanModal from './FeynmanModal';
 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import toast from 'react-hot-toast';
 
 interface NotebookListProps {
   notebooks: any[];
@@ -22,9 +21,7 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
   const [searchTerm, setSearchTerm] = useState('');
   const [items, setItems] = useState(notebooks);
   
-  // --- ESTADO SIMPLIFICADO ---
   const [feynmanProblem, setFeynmanProblem] = useState<any>(null);
-  // Removemos explanation e isSavingReview daqui para não travar a lista
 
   const router = useRouter();
 
@@ -82,7 +79,6 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     if (problem.solved) {
       toggleStatusDirectly(problem.id, true);
     } else {
-      // Abre o modal
       setFeynmanProblem(problem);
     }
   }
@@ -99,15 +95,11 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     }
   }
 
-  // --- NOVA CONFIRMAÇÃO OTIMISTA ---
   async function handleConfirmFeynman(difficulty: 'Easy' | 'Medium' | 'Hard', text: string) {
     const problemToUpdate = feynmanProblem;
-    
-    // 1. Fecha e atualiza UI na hora
     setFeynmanProblem(null);
     updateLocalProblem(problemToUpdate.id, { solved: true });
 
-    // 2. Calcula data em background
     const now = new Date();
     let daysToAdd = 1;
     if (difficulty === 'Medium') daysToAdd = 3;
@@ -116,7 +108,6 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     const nextReview = new Date();
     nextReview.setDate(now.getDate() + daysToAdd);
 
-    // 3. Salva no Supabase
     const { error } = await supabase
       .from('problems')
       .update({ 
@@ -131,7 +122,7 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
 
     if (error) {
       alert('Erro ao salvar revisão: ' + error.message);
-      updateLocalProblem(problemToUpdate.id, { solved: false }); // Reverte se der erro
+      updateLocalProblem(problemToUpdate.id, { solved: false });
       router.refresh();
     } else {
       router.refresh();
@@ -144,6 +135,17 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     );
     setSelectedNotebook({ ...selectedNotebook, problems: updatedProblems });
   }
+
+  // --- CÁLCULO DAS ESTATÍSTICAS (NOVO) ---
+  const getNotebookStats = () => {
+    if (!selectedNotebook || !selectedNotebook.problems) return { total: 0, solved: 0, percent: 0 };
+    const total = selectedNotebook.problems.length;
+    const solved = selectedNotebook.problems.filter((p: any) => p.solved).length;
+    const percent = total > 0 ? Math.round((solved / total) * 100) : 0;
+    return { total, solved, percent };
+  };
+
+  const stats = getNotebookStats();
 
   return (
     <>
@@ -208,9 +210,55 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
       {/* --- MODAL DETALHES DO CADERNO --- */}
       {selectedNotebook && (
         <div className="modal-backdrop" onClick={() => setSelectedNotebook(null)}>
+          <style jsx>{`
+            .modal-backdrop {
+              animation: fadeIn 0.2s ease-out forwards;
+            }
+            .modal-content {
+              animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              opacity: 0;
+              transform: translateY(20px) scale(0.96);
+            }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { to { opacity: 1; transform: translateY(0) scale(1); } }
+            
+            /* Badge de Porcentagem */
+            .stats-badge {
+              background: #f3f4f6;
+              padding: 4px 10px;
+              border-radius: 20px;
+              font-size: 0.8rem;
+              font-weight: 700;
+              color: #555;
+            }
+            .stats-text {
+              font-size: 0.95rem;
+              color: #666;
+              font-weight: 500;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            }
+          `}</style>
+
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{selectedNotebook.title}</h3>
+            <div className="modal-header" style={{ alignItems: 'flex-start' }}> {/* Ajuste de alinhamento */}
+              
+              <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
+                <h3 style={{margin: 0}}>{selectedNotebook.title}</h3>
+                
+                {/* --- AQUI ESTÁ A CONTAGEM NOVA --- */}
+                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                  <span className="stats-text">
+                    <CheckCircle2 size={16} color={stats.solved === stats.total && stats.total > 0 ? "#22c55e" : "#0070f3"} />
+                    {stats.solved} / {stats.total} Resolvidas
+                  </span>
+                  <span className="stats-badge">
+                    {stats.percent}%
+                  </span>
+                </div>
+              </div>
+
               <button className="modal-close" onClick={() => setSelectedNotebook(null)}>×</button>
             </div>
             
@@ -266,7 +314,7 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
         </div>
       )}
 
-      {/* --- MODAL FEYNMAN NOVO (IMPORTADO) --- */}
+      {/* --- MODAL FEYNMAN --- */}
       {feynmanProblem && (
         <FeynmanModal 
           problem={feynmanProblem}
