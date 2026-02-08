@@ -6,7 +6,7 @@ export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 const CODEFORCES_TAGS = [
-  "None", "implementation", "math", "greedy", "dp", "data structures",
+  "none", "task", "implementation", "math", "greedy", "dp", "data structures",
   "brute force", "constructive algorithms", "graphs", "sortings",
   "binary search", "dfs and similar", "trees", "strings",
   "number theory", "combinatorics", "geometry", "bitmasks",

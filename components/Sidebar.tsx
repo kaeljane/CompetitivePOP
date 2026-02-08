@@ -52,7 +52,7 @@ export default function Sidebar({ notebooks, allTags }: { notebooks: any[], allT
     <aside>
       {/* Widget Adicionar Questão */}
       <div className="widget">
-        <h3>Adicionar Questão</h3>
+        <h3>Add Questão || Task</h3>
         <form onSubmit={handleAddProblem}>
           <div className="form-group">
             <label>Nome da Questão</label>
