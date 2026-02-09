@@ -9,7 +9,7 @@ import { Search, CheckCircle2 } from 'lucide-react';
 import FeynmanModal from './FeynmanModal';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import toast from 'react-hot-toast'; // <--- IMPORTANTE: Adicionado para notificações
+import toast from 'react-hot-toast'; 
 
 interface NotebookListProps { notebooks: any[]; allTags: string[]; }
 
@@ -61,14 +61,12 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     else setFeynmanProblem(problem);
   }
 
-  // --- LÓGICA DE STREAK APLICADA AQUI ---
   async function toggleStatusDirectly(problemId: string, currentStatus: boolean) {
     const { error } = await supabase.from('problems').update({ solved: !currentStatus }).eq('id', problemId);
     
     if (!error) { 
       updateLocalProblem(problemId, { solved: !currentStatus }); 
       
-      // Se marcou como resolvido (true), chama a função do banco para atualizar o fogo
       if (!currentStatus === true) {
         await supabase.rpc('update_streak');
         toast.success("Questão resolvida! 🔥", { icon: '🔥', style: { background: '#333', color: '#fff' } });
@@ -78,6 +76,7 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     }
   }
 
+  // --- MUDANÇA PRINCIPAL AQUI ---
   async function handleConfirmFeynman(difficulty: 'Easy' | 'Medium' | 'Hard', text: string) {
     const problemToUpdate = feynmanProblem;
     setFeynmanProblem(null);
@@ -90,18 +89,33 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     const nextReview = new Date();
     nextReview.setDate(now.getDate() + daysToAdd);
 
+    // 1. Calcula o novo número de revisões (+1)
+    const currentCount = problemToUpdate.review_count || 0;
+    const newCount = currentCount + 1;
+
     const { error } = await supabase.from('problems').update({ 
-        solved: true, review_notes: text, last_reviewed_at: now.toISOString(),
-        next_review_at: nextReview.toISOString(), difficulty_rating: difficulty === 'Hard' ? 3 : difficulty === 'Medium' ? 2 : 1,
-        review_interval: daysToAdd 
+        solved: true, 
+        review_notes: text, 
+        last_reviewed_at: now.toISOString(),
+        next_review_at: nextReview.toISOString(), 
+        difficulty_rating: difficulty === 'Hard' ? 3 : difficulty === 'Medium' ? 2 : 1,
+        review_interval: daysToAdd,
+        review_count: newCount // 2. Salva o novo valor no banco
       }).eq('id', problemToUpdate.id);
 
     if (error) { 
-      alert(error.message); updateLocalProblem(problemToUpdate.id, { solved: false }); router.refresh(); 
+      alert(error.message); 
+      updateLocalProblem(problemToUpdate.id, { solved: false }); 
+      router.refresh(); 
     } else { 
-      // SUCESSO NO FEYNMAN -> ATUALIZA STREAK
+      // SUCESSO
       await supabase.rpc('update_streak');
-      toast.success("Ofensiva atualizada! 🔥", { icon: '🔥', style: { background: '#333', color: '#fff' } });
+      
+      // Feedback visual atualizado
+      toast.success(`Revisão #${newCount} registrada! 🧠`, { icon: '🧠', style: { background: '#333', color: '#fff' } });
+      
+      // Atualiza localmente para refletir na hora sem F5
+      updateLocalProblem(problemToUpdate.id, { review_count: newCount });
       router.refresh(); 
     }
   }
