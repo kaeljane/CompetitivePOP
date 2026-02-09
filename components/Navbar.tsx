@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AuthButton from './AuthButton';
 import { Brain } from 'lucide-react';
-import ThemeToggle from './ThemeToggle'; // <--- 1. IMPORTAÇÃO NOVA
+import ThemeToggle from './ThemeToggle';
+import StreakCounter from './StreakCounter'; 
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -23,7 +24,7 @@ export default function Navbar() {
       {/* 1. LOGO */}
       <Link href="/" className={styles.logoLink}>
         <svg className="hamburger-icon" viewBox="0 0 24 24" width="24" height="24">
-           {/* 2. CORREÇÃO: fill="currentColor" faz o ícone ficar branco no escuro e preto no claro */}
+           {/* fill="currentColor" faz o ícone ficar branco no escuro e preto no claro */}
            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"></path>
         </svg>
         <div className={styles.logoText}>
@@ -50,13 +51,13 @@ export default function Navbar() {
           Revisão
         </Link>
 
-        {/* 3. NOVO: Botão de Tema (Lua/Sol) */}
-        <div style={{ marginLeft: '5px' }}>
+        {/* 3. NOVO: Streak (Fogo) e Tema (Lua/Sol) juntos */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '5px' }}>
+          <StreakCounter />
           <ThemeToggle />
         </div>
 
         {/* Login */}
-        {/* 4. CORREÇÃO: Borda usando variável para não ficar "branca demais" no escuro */}
         <div style={{ marginLeft: '10px', paddingLeft: '15px', borderLeft: '1px solid var(--color-border)' }}>
             <AuthButton />
         </div>

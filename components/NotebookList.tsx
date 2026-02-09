@@ -9,6 +9,7 @@ import { Search, CheckCircle2 } from 'lucide-react';
 import FeynmanModal from './FeynmanModal';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
+import toast from 'react-hot-toast'; // <--- IMPORTANTE: Adicionado para notificações
 
 interface NotebookListProps { notebooks: any[]; allTags: string[]; }
 
@@ -60,9 +61,21 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
     else setFeynmanProblem(problem);
   }
 
+  // --- LÓGICA DE STREAK APLICADA AQUI ---
   async function toggleStatusDirectly(problemId: string, currentStatus: boolean) {
     const { error } = await supabase.from('problems').update({ solved: !currentStatus }).eq('id', problemId);
-    if (!error) { updateLocalProblem(problemId, { solved: !currentStatus }); router.refresh(); }
+    
+    if (!error) { 
+      updateLocalProblem(problemId, { solved: !currentStatus }); 
+      
+      // Se marcou como resolvido (true), chama a função do banco para atualizar o fogo
+      if (!currentStatus === true) {
+        await supabase.rpc('update_streak');
+        toast.success("Questão resolvida! 🔥", { icon: '🔥', style: { background: '#333', color: '#fff' } });
+      }
+      
+      router.refresh(); 
+    }
   }
 
   async function handleConfirmFeynman(difficulty: 'Easy' | 'Medium' | 'Hard', text: string) {
@@ -83,8 +96,14 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
         review_interval: daysToAdd 
       }).eq('id', problemToUpdate.id);
 
-    if (error) { alert(error.message); updateLocalProblem(problemToUpdate.id, { solved: false }); router.refresh(); }
-    else { router.refresh(); }
+    if (error) { 
+      alert(error.message); updateLocalProblem(problemToUpdate.id, { solved: false }); router.refresh(); 
+    } else { 
+      // SUCESSO NO FEYNMAN -> ATUALIZA STREAK
+      await supabase.rpc('update_streak');
+      toast.success("Ofensiva atualizada! 🔥", { icon: '🔥', style: { background: '#333', color: '#fff' } });
+      router.refresh(); 
+    }
   }
 
   function updateLocalProblem(id: string, updates: any) {
@@ -116,7 +135,6 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
                 width: '100%', padding: '10px 10px 10px 40px', borderRadius: '8px', outline: 'none', fontSize: '0.95rem',
-                /* CORRIGIDO: Input agora usa variáveis de cor */
                 backgroundColor: 'var(--color-widget-bg)',
                 border: '1px solid var(--color-border)',
                 color: 'var(--color-text)',
@@ -157,14 +175,13 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
             .modal-content {
               animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
               opacity: 0; transform: translateY(20px) scale(0.96);
-              /* CORRIGIDO: Fundo do modal */
               background-color: var(--color-widget-bg);
             }
             @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
             @keyframes slideUp { to { opacity: 1; transform: translateY(0) scale(1); } }
             
             .stats-badge {
-              background: var(--color-background); /* Fundo escuro */
+              background: var(--color-background); 
               padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted);
             }
             .stats-text { font-size: 0.95rem; color: var(--color-text-muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
@@ -201,7 +218,7 @@ export default function NotebookList({ notebooks, allTags }: NotebookListProps) 
                       <a href={prob.url} target="_blank" rel="noopener noreferrer"
                         style={{
                           textDecoration: prob.solved ? 'line-through' : 'none',
-                          color: prob.solved ? '#28a745' : 'var(--color-text)', /* Cor do texto da questão */
+                          color: prob.solved ? '#28a745' : 'var(--color-text)',
                           fontWeight: prob.solved ? 'normal' : '600'
                         }}
                       >{prob.title}</a>
