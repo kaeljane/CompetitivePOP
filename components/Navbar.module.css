@@ -4,8 +4,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.8rem 2rem;
-  background: #ffffff;
-  border-bottom: 1px solid #eaeaea;
+  
+  /* USE AS VARIÁVEIS AQUI: */
+  background: var(--color-widget-bg); 
+  border-bottom: 1px solid var(--color-border);
+  
   position: sticky;
   top: 0;
   z-index: 100;
@@ -22,11 +25,11 @@
 .logoText {
   font-weight: 700;
   font-size: 1.3rem;
-  color: #333;
+  color: var(--color-text); /* Use variável */
 }
 
 .highlight {
-  color: #007bff;
+  color: var(--color-primary); /* Use variável */
 }
 
 /* Navegação */
@@ -36,46 +39,40 @@
   align-items: center;
 }
 
-/* O BOTÃO (AQUI ESTÁ A MÁGICA) */
+/* O BOTÃO */
 .navItem {
-  /* Remove o traço */
   text-decoration: none !important;
-  
-  /* Layout */
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
   border-radius: 8px;
-  
-  /* Fonte e Cor */
   font-weight: 600;
   font-size: 0.95rem;
-  color: #666;
+  
+  /* Cores dinâmicas */
+  color: var(--color-text-muted); 
   background: transparent;
   
-  /* Animação */
   transition: all 0.2s ease-in-out;
   cursor: pointer;
   border: none;
 }
 
-/* Hover */
 .navItem:hover {
-  background-color: #f5f5f5;
-  color: #007bff;
+  background-color: var(--color-hover); /* Variável nova */
+  color: var(--color-primary);
   transform: translateY(-1px);
 }
 
-/* ESTADO ATIVO (A CAIXA AZUL) */
 .active {
-  background-color: #007bff !important;
-  color: white !important;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important; /* Texto branco no ativo sempre fica bom */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .active:hover {
-  background-color: #0069d9 !important;
-  color: white !important;
+  background-color: var(--color-primary-dark) !important;
+  color: #ffffff !important;
   transform: none;
 }

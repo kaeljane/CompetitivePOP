@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AuthButton from './AuthButton';
 import { Brain } from 'lucide-react';
-// Importa o módulo CSS que acabamos de criar
+import ThemeToggle from './ThemeToggle'; // <--- 1. IMPORTAÇÃO NOVA
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -23,7 +23,8 @@ export default function Navbar() {
       {/* 1. LOGO */}
       <Link href="/" className={styles.logoLink}>
         <svg className="hamburger-icon" viewBox="0 0 24 24" width="24" height="24">
-           <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="#333"></path>
+           {/* 2. CORREÇÃO: fill="currentColor" faz o ícone ficar branco no escuro e preto no claro */}
+           <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"></path>
         </svg>
         <div className={styles.logoText}>
           <span className={styles.highlight}>Competitive</span>POP
@@ -49,8 +50,14 @@ export default function Navbar() {
           Revisão
         </Link>
 
+        {/* 3. NOVO: Botão de Tema (Lua/Sol) */}
+        <div style={{ marginLeft: '5px' }}>
+          <ThemeToggle />
+        </div>
+
         {/* Login */}
-        <div style={{ marginLeft: '10px', paddingLeft: '15px', borderLeft: '1px solid #eaeaea' }}>
+        {/* 4. CORREÇÃO: Borda usando variável para não ficar "branca demais" no escuro */}
+        <div style={{ marginLeft: '10px', paddingLeft: '15px', borderLeft: '1px solid var(--color-border)' }}>
             <AuthButton />
         </div>
 

@@ -4,16 +4,17 @@
   line-height: 1.6;
   font-weight: 400;
 
-  /* Paleta de Cores (Tema Claro) */
+  /* === TEMA CLARO (Light Mode) === */
   --color-primary: #007bff;
   --color-primary-dark: #0056b3;
-  --color-text: #212529;
-  --color-text-muted: #6c757d;
-  --color-background: #f4f7f6;
-  --color-widget-bg: #ffffff;
+  --color-text: #212529;         /* Texto Escuro */
+  --color-text-muted: #6c757d;   /* Cinza */
+  --color-background: #f4f7f6;   /* Fundo Claro */
+  --color-widget-bg: #ffffff;    /* Card Branco */
   --color-border: #dee2e6;
   --color-success: #28a745;
   --color-danger: #dc3545;
+  --color-hover: #f5f5f5;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,18 +22,31 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* === TEMA ESCURO (Dark Mode) === */
+[data-theme='dark'] {
+  --color-primary: #3b82f6;      /* Azul Brilhante */
+  --color-primary-dark: #60a5fa;
+  --color-text: #f1f5f9;         /* Branco Quase Puro */
+  --color-text-muted: #94a3b8;   /* Cinza Claro */
+  --color-background: #0f172a;   /* Azul/Preto Profundo */
+  --color-widget-bg: #1e293b;    /* Azul/Cinza Escuro */
+  --color-border: #334155;       /* Bordas Suaves */
+  --color-success: #4ade80;
+  --color-danger: #f87171;
+  --color-hover: #334155;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-/* --- AQUI ESTÁ A CORREÇÃO DO TRAÇO --- */
-/* Isso garante que NENHUM link no site tenha sublinhado por padrão */
+/* Tira o sublinhado de todos os links */
 a {
   text-decoration: none;
   color: inherit;
-  transition: color 0.2s ease;
 }
 
 body {
@@ -74,7 +88,7 @@ body {
   width: 24px;
   height: 24px;
   cursor: pointer;
-  fill: var(--color-text);
+  fill: var(--color-text); /* Ícone se adapta ao tema */
 }
 
 .logo-text {
@@ -83,7 +97,6 @@ body {
   color: var(--color-text);
 }
 
-/* Botões da Navegação (Estilo Base Global) */
 .nav-button {
   font-size: 1rem;
   font-weight: 500;
@@ -94,15 +107,11 @@ body {
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s ease;
-  
-  /* Flexbox para alinhar ícones se houver */
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
 
 .nav-button:hover {
-  background-color: var(--color-background);
+  background-color: var(--color-hover);
   color: var(--color-text);
 }
 
@@ -113,10 +122,10 @@ body {
 
 /* --- 3. Layout Principal --- */
 #page-header-container {
-  padding: 0 1.5rem; 
+  padding: 0 1.5rem;
   max-width: 1300px; 
   width: 100%;
-  margin: 0 auto; 
+  margin: 0 auto;
   position: sticky;
   top: 65px; 
   background-color: var(--color-background);
@@ -137,7 +146,8 @@ body {
 .page-header h2 {
   font-size: 1.75rem;
   font-weight: 600;
-  color: #343a40;
+  /* CORREÇÃO AQUI: Antes era #343a40, agora é variável */
+  color: var(--color-text);
 }
 
 .container {
@@ -180,6 +190,7 @@ aside {
 .widget h3 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
+  color: var(--color-text); /* Garante título visível */
 }
 
 /* Stats */
@@ -218,9 +229,12 @@ aside {
   width: 100%;
   max-width: 350px;
   transition: border-color 0.2s, box-shadow 0.2s;
+  /* Ícone SVG de lupa dentro do input */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 1rem center;
+  background-color: var(--color-widget-bg);
+  color: var(--color-text);
 }
 
 #search-notebook:focus {
@@ -255,7 +269,8 @@ aside {
 .notebook-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-primary);
+  /* CORREÇÃO: Título do caderno */
+  color: var(--color-text); 
   margin-bottom: 0.5rem;
 }
 
@@ -272,7 +287,7 @@ aside {
   color: var(--color-text);
 }
 
-/* Forms */
+/* Forms e Inputs Globais */
 form {
   display: flex;
   flex-direction: column;
@@ -283,32 +298,34 @@ form label {
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: -0.5rem; 
+  color: var(--color-text); /* Labels visíveis */
 }
 
-form input[type="text"],
-form input[type="url"],
-form input[type="number"],
-form select {
+/* CORREÇÃO GERAL DE INPUTS */
+input, select, textarea {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border) !important;
   border-radius: 8px;
   font-size: 0.95rem;
-  background-color: #fff;
+  background-color: var(--color-widget-bg) !important;
+  color: var(--color-text) !important;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-form input:focus,
-form select:focus {
+input::placeholder, textarea::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: var(--color-primary) !important;
   box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
 }
 
 select[multiple] {
   padding: 0.5rem;
   height: 120px; 
-  background-color: #fff;
 }
 
 select[multiple] option {
@@ -396,7 +413,8 @@ select[multiple] option:checked {
 
 .modal-header h3 {
   font-size: 1.5rem;
-  color: var(--color-primary);
+  /* CORREÇÃO: Título do modal */
+  color: var(--color-text);
 }
 
 .modal-close {
@@ -440,6 +458,7 @@ select[multiple] option:checked {
 .problem-list-item a {
   font-size: 1.1rem;
   font-weight: 600;
+  /* CORREÇÃO: Links da lista */
   color: var(--color-text);
   text-decoration: none;
   transition: color 0.2s;
@@ -511,7 +530,7 @@ select[multiple] option:checked {
   .nav-button {
     flex: 1; 
     text-align: center;
-    justify-content: center; /* Centraliza no mobile */
+    justify-content: center;
   }
 
   #page-header-container {

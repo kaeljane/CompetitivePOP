@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react'; // Certifique-se de ter importado ou use SVG
+import { X } from 'lucide-react'; 
 
 interface FeynmanModalProps {
   problem: any;
@@ -10,37 +10,29 @@ interface FeynmanModalProps {
 }
 
 export default function FeynmanModal({ problem, onClose, onConfirm }: FeynmanModalProps) {
-  // Estado local: SÓ este componente renderiza ao digitar
   const [explanation, setExplanation] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Foco automático ao abrir
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
   }, []);
 
-  // Função para fechar com animação
   const handleClose = () => {
     setIsClosing(true);
-    // Espera a animação de saída (200ms) terminar antes de remover do DOM
     setTimeout(() => {
       onClose();
     }, 200);
   };
 
-  // Função ao confirmar
   const handleConfirmClick = (difficulty: 'Easy' | 'Medium' | 'Hard') => {
     if (!explanation.trim()) {
       alert("Por favor, digite algo no Método Feynman.");
       return;
     }
-    // 1. Inicia animação de saída
     setIsClosing(true);
-    
-    // 2. Aguarda animação e manda os dados para o pai
     setTimeout(() => {
       onConfirm(difficulty, explanation);
     }, 200);
@@ -56,17 +48,17 @@ export default function FeynmanModal({ problem, onClose, onConfirm }: FeynmanMod
           padding: 20px;
         }
         .modal-content-animated {
-          background: white; width: 100%; max-width: 500px;
+          /* CORRIGIDO: Fundo agora usa a variável do tema */
+          background: var(--color-widget-bg); 
+          width: 100%; max-width: 500px;
           border-radius: 12px; padding: 20px;
           box-shadow: 0 10px 40px rgba(0,0,0,0.2);
           transform: scale(0.95); opacity: 0;
         }
 
-        /* Animações de Entrada */
         .fade-in { animation: fadeIn 0.2s forwards; }
         .fade-in .modal-content-animated { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* Animações de Saída */
         .fade-out { animation: fadeOut 0.2s forwards; }
         .fade-out .modal-content-animated { animation: popOut 0.2s forwards; }
 
@@ -92,13 +84,16 @@ export default function FeynmanModal({ problem, onClose, onConfirm }: FeynmanMod
 
       <div className="modal-content-animated" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-          <h3 style={{ margin: 0, fontSize: '1.2rem' }}>🎉 Concluir: {problem.title}</h3>
+          {/* CORRIGIDO: Cor do título */}
+          <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-text)' }}>🎉 Concluir: {problem.title}</h3>
           <button onClick={handleClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
-            <X size={24} color="#666" />
+            {/* CORRIGIDO: Cor do ícone X */}
+            <X size={24} color="var(--color-text-muted)" />
           </button>
         </div>
 
-        <p style={{ marginBottom: '8px', fontWeight: 600, color: '#444' }}>Método Feynman (Explique para aprender):</p>
+        {/* CORRIGIDO: Cor do texto da pergunta */}
+        <p style={{ marginBottom: '8px', fontWeight: 600, color: 'var(--color-text-muted)' }}>Método Feynman (Explique para aprender):</p>
         <textarea
           ref={textareaRef}
           value={explanation}
@@ -106,12 +101,17 @@ export default function FeynmanModal({ problem, onClose, onConfirm }: FeynmanMod
           placeholder="Explique a solução com suas palavras..."
           style={{
             width: '100%', height: '120px', padding: '12px',
-            borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit',
-            fontSize: '1rem', resize: 'vertical', marginBottom: '20px'
+            borderRadius: '8px', fontFamily: 'inherit',
+            fontSize: '1rem', resize: 'vertical', marginBottom: '20px',
+            /* CORRIGIDO: Cores do campo de texto */
+            backgroundColor: 'var(--color-background)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
           }}
         />
 
-        <p style={{ marginBottom: '10px', fontWeight: 600, color: '#444' }}>Como foi a dificuldade?</p>
+        {/* CORRIGIDO: Cor do texto da pergunta */}
+        <p style={{ marginBottom: '10px', fontWeight: 600, color: 'var(--color-text-muted)' }}>Como foi a dificuldade?</p>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={() => handleConfirmClick('Hard')} className="btn-option" style={{ background: '#ff4d4d' }}>
             Difícil (1 dia)
